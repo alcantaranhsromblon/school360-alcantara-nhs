@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DriveUploadField } from '../common/DriveUploadField';
 import { formatBytes } from '../../lib/driveUpload';
+import { toImageUrl } from '../../lib/drive';
 import {
   LayoutDashboard,
   Building,
@@ -802,6 +803,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           order: orgChart.length + 1
                         }
                       });
+                    } else if (activeModule === 'gallery') {
+                      setEditingItem({
+                        module: 'gallery',
+                        isNew: true,
+                        data: {
+                          id: 'album-' + Date.now(),
+                          title: '',
+                          description: '',
+                          coverImage: '',
+                          createdDate: new Date().toISOString().split('T')[0],
+                          photos: [],
+                          isPublished: true
+                        }
+                      });
                     } else if (activeModule === 'organizations') {
                       setEditingItem({
                         module: 'organizations',
@@ -947,6 +962,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <Edit2 className="w-4 h-4 text-slate-600" />
                       </button>
                       <button onClick={() => triggerDelete(person.fullName, () => store.deleteOrgChartNode(person.id))} className="p-1.5 hover:bg-red-100 rounded">
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {activeModule === 'gallery' && albums.length === 0 && (
+                  <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                    No photo albums yet. Click <b>Add New Record</b> to create an album, then add photos inside it.
+                  </div>
+                )}
+
+                {activeModule === 'gallery' && albums.map(a => (
+                  <div key={a.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-white flex items-center justify-center shrink-0">
+                        {a.coverImage ? <img src={toImageUrl(a.coverImage, 200)} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="w-5 h-5 text-slate-400" />}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">
+                          {a.title} {!a.isPublished && <span className="ml-1 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Hidden</span>}
+                        </h4>
+                        <p className="text-xs text-slate-500">{a.createdDate} · {(a.photos || []).length} photo(s)</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEditingItem({ module: 'gallery', isNew: false, data: JSON.parse(JSON.stringify(a)) })} className="p-1.5 hover:bg-slate-200 rounded">
+                        <Edit2 className="w-4 h-4 text-slate-600" />
+                      </button>
+                      <button onClick={() => triggerDelete(a.title, () => store.deleteAlbum(a.id))} className="p-1.5 hover:bg-red-100 rounded">
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
                     </div>
@@ -1319,6 +1364,82 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </>
               )}
 
+              {editingItem.module === 'gallery' && (() => {
+                const d = editingItem.data;
+                const set = (patch: any) => setEditingItem({ ...editingItem, data: { ...d, ...patch } });
+                const inp = 'w-full px-3 py-2 border border-slate-300 rounded-lg';
+                const lbl = 'block font-bold text-slate-700 mb-1';
+                const photos: any[] = d.photos || [];
+                const updPhoto = (i: number, patch: any) =>
+                  set({ photos: photos.map((x, idx) => (idx === i ? { ...x, ...patch } : x)) });
+                return (
+                  <>
+                    <div>
+                      <label className={lbl}>Album Title</label>
+                      <input type="text" value={d.title || ''} onChange={(e) => set({ title: e.target.value })} className={inp} />
+                    </div>
+                    <div>
+                      <label className={lbl}>Description</label>
+                      <textarea rows={2} value={d.description || ''} onChange={(e) => set({ description: e.target.value })} className={inp} />
+                    </div>
+                    <div>
+                      <label className={lbl}>Album Date</label>
+                      <input type="date" value={d.createdDate || ''} onChange={(e) => set({ createdDate: e.target.value })} className={inp} />
+                    </div>
+                    <DriveUploadField
+                      label="Cover Image"
+                      showPreview
+                      value={d.coverImage || ''}
+                      onChange={(url) => set({ coverImage: url })}
+                    />
+
+                    <div className="space-y-3 pt-2 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-slate-700">Photos in this album ({photos.length})</label>
+                        <button
+                          type="button"
+                          className="text-[11px] font-bold text-blue-900 hover:text-blue-700"
+                          onClick={() => set({ photos: [...photos, { id: 'photo-' + Date.now() + '-' + photos.length, caption: '', imageUrl: '', takenDate: new Date().toISOString().split('T')[0], approved: true }] })}
+                        >
+                          + Add photo
+                        </button>
+                      </div>
+                      {photos.length === 0 && (
+                        <p className="text-[11px] text-slate-500">No photos yet. Click "+ Add photo", then upload an image or paste a link.</p>
+                      )}
+                      {photos.map((ph, i) => (
+                        <div key={ph.id || i} className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                          <DriveUploadField
+                            label={`Photo ${i + 1}`}
+                            showPreview
+                            value={ph.imageUrl || ''}
+                            onChange={(url) => updPhoto(i, { imageUrl: url })}
+                          />
+                          <div className="grid grid-cols-12 gap-2">
+                            <input placeholder="Caption" value={ph.caption || ''} onChange={(e) => updPhoto(i, { caption: e.target.value })} className={inp + ' col-span-8'} />
+                            <input type="date" value={ph.takenDate || ''} onChange={(e) => updPhoto(i, { takenDate: e.target.value })} className={inp + ' col-span-4'} />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-2 text-slate-700 font-semibold">
+                              <input type="checkbox" checked={ph.approved !== false} onChange={(e) => updPhoto(i, { approved: e.target.checked })} />
+                              Approved (shown publicly)
+                            </label>
+                            <button type="button" className="text-[11px] font-semibold text-red-600 hover:text-red-700" onClick={() => set({ photos: photos.filter((_, idx) => idx !== i) })}>
+                              Remove photo
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <label className="flex items-center gap-2 pt-2 border-t border-slate-100 text-slate-700 font-semibold">
+                      <input type="checkbox" checked={d.isPublished !== false} onChange={(e) => set({ isPublished: e.target.checked })} />
+                      Published (visible on the public website)
+                    </label>
+                  </>
+                );
+              })()}
+
               {editingItem.module === 'organizations' && (() => {
                 const d = editingItem.data;
                 const set = (patch: any) => setEditingItem({ ...editingItem, data: { ...d, ...patch } });
@@ -1432,7 +1553,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               })()}
 
               {/* General fallback save for other entities */}
-              {!['news', 'issuances', 'users', 'org-chart', 'organizations'].includes(editingItem.module) && (
+              {!['news', 'issuances', 'users', 'org-chart', 'organizations', 'gallery'].includes(editingItem.module) && (
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Title / Name</label>
                   <input
@@ -1450,7 +1571,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               )}
 
-              {!['news', 'issuances', 'users', 'org-chart', 'organizations'].includes(editingItem.module) && editingItem.data.imageUrl !== undefined && (
+              {!['news', 'issuances', 'users', 'org-chart', 'organizations', 'gallery'].includes(editingItem.module) && editingItem.data.imageUrl !== undefined && (
                 <DriveUploadField
                   label="Image"
                   showPreview
@@ -1488,6 +1609,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       store.saveEvent(editingItem.data);
                     } else if (editingItem.module === 'org-chart') {
                       store.saveOrgChartNode(editingItem.data);
+                    } else if (editingItem.module === 'gallery') {
+                      const a = editingItem.data;
+                      if (!a.title?.trim()) throw new Error('Album title is required.');
+                      const photos = (a.photos || []).filter((ph: any) => ph.imageUrl?.trim());
+                      store.saveAlbum({ ...a, photos, coverImage: a.coverImage || photos[0]?.imageUrl || '' });
                     } else if (editingItem.module === 'organizations') {
                       const o = editingItem.data;
                       if (!o.name?.trim()) throw new Error('Organization name is required.');
