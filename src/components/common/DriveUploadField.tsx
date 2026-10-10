@@ -1,6 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Upload, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { uploadToDrive, DriveUploadResult } from '../../lib/driveUpload';
+import { isBrowserDriveConfigured } from '../../lib/driveConfig';
+import { preloadGis, hasDriveToken, signInToDrive } from '../../lib/driveBrowser';
 import { toImageUrl } from '../../lib/drive';
 
 interface Props {
@@ -23,6 +25,24 @@ export const DriveUploadField: React.FC<Props> = ({
   const [percent, setPercent] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+
+  // Browser uploads need a Google sign-in popup. Browsers only allow popups opened directly from a click,
+  // so sign-in is its own button press (before choosing a file) and Google's script is loaded in advance.
+  useEffect(() => { if (isBrowserDriveConfigured) preloadGis(); }, []);
+  const needsSignIn = isBrowserDriveConfigured && !hasDriveToken();
+
+  const handleButton = async () => {
+    if (!needsSignIn) { inputRef.current?.click(); return; }
+    setError(null); setNote(null); setBusy(true);
+    try {
+      await signInToDrive();
+      setNote('Signed in to Google. Now click "Upload to Drive" to choose your file.');
+    } catch (err: any) {
+      setError(err?.message || 'Google sign-in failed. Allow pop-ups for this site and try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,11 +77,11 @@ export const DriveUploadField: React.FC<Props> = ({
         <button
           type="button"
           disabled={busy}
-          onClick={() => inputRef.current?.click()}
+          onClick={handleButton}
           className="shrink-0 px-3 py-2 bg-blue-900 hover:bg-blue-800 disabled:opacity-60 text-white rounded-lg text-xs font-bold flex items-center gap-1.5"
         >
           {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-          {busy ? `${percent}%` : 'Upload to Drive'}
+          {busy ? (needsSignIn ? 'Signing in…' : `${percent}%`) : needsSignIn ? 'Sign in with Google' : 'Upload to Drive'}
         </button>
         <input ref={inputRef} type="file" accept={accept} onChange={handleFile} className="hidden" />
       </div>

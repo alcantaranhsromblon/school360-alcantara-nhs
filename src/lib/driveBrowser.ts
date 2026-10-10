@@ -29,9 +29,23 @@ function loadGis(): Promise<void> {
   return gisPromise;
 }
 
+/** Load Google's sign-in script ahead of time so the sign-in popup can open straight from a button click. */
+export function preloadGis(): void { loadGis().catch(() => {}); }
+
+/** True when a still-valid Google token is cached (no sign-in popup needed). */
+export function hasDriveToken(): boolean {
+  return !!cached && Date.now() < cached.expires - 30_000;
+}
+
+/** Opens the Google sign-in popup. Call this directly inside a click handler (before any await). */
+export function signInToDrive(): Promise<void> {
+  return getAccessToken().then(() => undefined);
+}
+
 async function getAccessToken(): Promise<string> {
   if (cached && Date.now() < cached.expires - 30_000) return cached.token;
-  await loadGis();
+  // Only await when the script is not ready yet; awaiting would otherwise make the browser block the popup.
+  if (!(window as any).google?.accounts?.oauth2) await loadGis();
   return new Promise((resolve, reject) => {
     const client = (window as any).google.accounts.oauth2.initTokenClient({
       client_id: DRIVE_CLIENT_ID,
