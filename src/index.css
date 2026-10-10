@@ -1,5 +1,38 @@
 @import "tailwindcss";
 
+/* Brand palette taken from the school logo:
+   navy #053a70 · gold #eac22d · flame red #b3141c · laurel green #093921 */
+@theme {
+  --color-blue-50:  #eef5fc;
+  --color-blue-100: #d9e8f7;
+  --color-blue-200: #b3d1ef;
+  --color-blue-300: #7fb0e0;
+  --color-blue-400: #4a89cc;
+  --color-blue-500: #2a73b8;
+  --color-blue-600: #1b6bb8;
+  --color-blue-700: #115a9f;
+  --color-blue-800: #0a4a86;
+  --color-blue-900: #053a70;
+  --color-blue-950: #032b52;
+
+  --color-indigo-950: #022343;
+
+  --color-amber-50:  #fffbea;
+  --color-amber-100: #fdf3c4;
+  --color-amber-200: #fae78d;
+  --color-amber-300: #f5d855;
+  --color-amber-400: #eac22d;
+  --color-amber-500: #d4a817;
+  --color-amber-600: #b08710;
+  --color-amber-700: #8a6710;
+  --color-amber-800: #6e5013;
+  --color-amber-900: #5a4114;
+  --color-amber-950: #332408;
+
+  --color-red-600: #b3141c;
+  --color-red-700: #96111a;
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;

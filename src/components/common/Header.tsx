@@ -13,8 +13,7 @@ import {
   Bell,
   CheckSquare,
   LayoutDashboard,
-  Building,
-  GraduationCap
+  Building
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { store } from '../../services/store';
@@ -129,13 +128,12 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-3.5 cursor-pointer group select-none"
           >
-            {/* DepEd & School Emblem Seal */}
-            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-blue-900 to-indigo-950 p-1 shadow-md border-2 border-amber-400/80 flex items-center justify-center shrink-0 group-hover:scale-102 transition-transform">
-              <div className="w-full h-full rounded-full bg-blue-950 flex flex-col items-center justify-center text-center p-1">
-                <GraduationCap className="w-6 h-6 text-amber-300" />
-                <span className="text-[7px] font-bold text-white tracking-widest leading-none mt-0.5">ANHS</span>
-              </div>
-            </div>
+            {/* School Logo */}
+            <img
+              src="/logo.png"
+              alt="Alcantara National High School seal"
+              className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform"
+            />
 
             <div>
               <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center gap-2">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, ExternalLink, Shield, GraduationCap } from 'lucide-react';
+import { Mail, Phone, MapPin, ExternalLink, Shield } from 'lucide-react';
 import { store } from '../../services/store';
 
 interface FooterProps {
@@ -18,9 +18,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
           {/* Col 1: School Identity */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-blue-950 border border-amber-400 flex items-center justify-center shrink-0">
-                <GraduationCap className="w-6 h-6 text-amber-400" />
-              </div>
+              <img src="/logo.png" alt="Alcantara National High School seal" className="w-12 h-12 object-contain shrink-0" />
               <div>
                 <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">DepEd Romblon</div>
                 <div className="text-sm font-extrabold text-white leading-tight">Alcantara National High School</div>
