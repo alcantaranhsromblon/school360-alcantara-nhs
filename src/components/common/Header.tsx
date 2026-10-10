@@ -279,11 +279,11 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Desktop Horizontal Navigation Bar */}
       <nav className="hidden lg:block bg-blue-950 text-white select-none" ref={navRef}>
         <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
-          <div className="flex items-center space-x-1">
+          <div className="flex flex-wrap items-center gap-x-0.5">
             {/* 1. Home */}
             <button
               onClick={() => handleNavClick('home')}
-              className={`px-3.5 py-3 text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
+              className={`px-2.5 xl:px-3.5 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
                 currentView === 'home'
                   ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                   : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -296,7 +296,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="relative">
               <button
                 onClick={() => setOpenDropdown(openDropdown === 'about' ? null : 'about')}
-                className={`px-3.5 py-3 text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
+                className={`px-2.5 xl:px-3.5 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
                   currentView.startsWith('about') || currentView.startsWith('deped')
                     ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                     : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -372,7 +372,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="relative">
               <button
                 onClick={() => setOpenDropdown(openDropdown === 'campuses' ? null : 'campuses')}
-                className={`px-3.5 py-3 text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
+                className={`px-2.5 xl:px-3.5 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
                   currentView.startsWith('campuses')
                     ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                     : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -383,7 +383,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {openDropdown === 'campuses' && (
-                <div className="absolute top-full left-0 w-64 bg-white text-slate-800 rounded-b-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in duration-100">
+                <div className="absolute top-full left-0 w-64 max-w-[calc(100vw-1.5rem)] bg-white text-slate-800 rounded-b-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in duration-100">
                   {campuses.map(c => (
                     <button
                       key={c.id}
@@ -402,7 +402,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="relative">
               <button
                 onClick={() => setOpenDropdown(openDropdown === 'news' ? null : 'news')}
-                className={`px-3.5 py-3 text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
+                className={`px-2.5 xl:px-3.5 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
                   ['news', 'awards', 'programs', 'events', 'gallery'].includes(currentView)
                     ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                     : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -451,7 +451,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* 5. School Organizational Chart [Direct link] */}
             <button
               onClick={() => handleNavClick('org-chart')}
-              className={`px-3.5 py-3 text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
+              className={`px-2.5 xl:px-3.5 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
                 currentView === 'org-chart'
                   ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                   : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -464,7 +464,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="relative">
               <button
                 onClick={() => setOpenDropdown(openDropdown === 'orgs' ? null : 'orgs')}
-                className={`px-3.5 py-3 text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
+                className={`px-2.5 xl:px-3.5 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1 border-b-2 ${
                   currentView.startsWith('organization')
                     ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                     : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -475,7 +475,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {openDropdown === 'orgs' && (
-                <div className="absolute top-full left-0 w-64 bg-white text-slate-800 rounded-b-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in duration-100">
+                <div className="absolute top-full left-0 w-64 max-w-[calc(100vw-1.5rem)] bg-white text-slate-800 rounded-b-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in duration-100">
                   {orgs.map(o => (
                     <button
                       key={o.id}
@@ -498,7 +498,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* School Issuances */}
                 <button
                   onClick={() => handleNavClick('issuances')}
-                  className={`px-3 py-3 text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
+                  className={`px-2.5 xl:px-3 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
                     currentView === 'issuances'
                       ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                       : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -511,7 +511,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* School Updates */}
                 <button
                   onClick={() => handleNavClick('updates')}
-                  className={`px-3 py-3 text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
+                  className={`px-2.5 xl:px-3 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
                     currentView === 'updates'
                       ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                       : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
@@ -524,7 +524,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {/* School Monitoring */}
                 <button
                   onClick={() => handleNavClick('monitoring')}
-                  className={`px-3 py-3 text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
+                  className={`px-2.5 xl:px-3 py-3 whitespace-nowrap text-xs font-semibold transition-colors flex items-center gap-1.5 border-b-2 ${
                     currentView === 'monitoring'
                       ? 'border-amber-400 text-amber-300 bg-blue-900/60'
                       : 'border-transparent text-slate-200 hover:text-white hover:bg-blue-900/40'
