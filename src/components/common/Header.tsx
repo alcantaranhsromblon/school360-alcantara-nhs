@@ -476,6 +476,9 @@ export const Header: React.FC<HeaderProps> = ({
 
               {openDropdown === 'orgs' && (
                 <div className="absolute top-full left-0 w-64 max-w-[calc(100vw-1.5rem)] bg-white text-slate-800 rounded-b-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in duration-100">
+                  {orgs.length === 0 && (
+                    <div className="px-4 py-3 text-xs text-slate-500">No organizations have been added yet.</div>
+                  )}
                   {orgs.map(o => (
                     <button
                       key={o.id}

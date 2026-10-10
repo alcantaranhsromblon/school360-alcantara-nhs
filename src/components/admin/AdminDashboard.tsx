@@ -802,6 +802,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           order: orgChart.length + 1
                         }
                       });
+                    } else if (activeModule === 'organizations') {
+                      setEditingItem({
+                        module: 'organizations',
+                        isNew: true,
+                        data: {
+                          id: 'orgz-' + Date.now(),
+                          code: 'NEW_ORG',
+                          name: '',
+                          acronym: '',
+                          description: '',
+                          objectives: [],
+                          adviser: '',
+                          presidentOrHead: '',
+                          logoUrl: '',
+                          officers: [],
+                          recentActivities: [],
+                          announcements: [],
+                          isPublished: true
+                        }
+                      });
                     } else if (activeModule === 'updates') {
                       setEditingItem({
                         module: 'updates',
@@ -927,6 +947,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <Edit2 className="w-4 h-4 text-slate-600" />
                       </button>
                       <button onClick={() => triggerDelete(person.fullName, () => store.deleteOrgChartNode(person.id))} className="p-1.5 hover:bg-red-100 rounded">
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {activeModule === 'organizations' && organizations.length === 0 && (
+                  <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                    No school organizations yet. Click <b>Add New Record</b> to create the first one (e.g. SSLG, YES-O, The Beacon).
+                  </div>
+                )}
+
+                {activeModule === 'organizations' && organizations.map(o => (
+                  <div key={o.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 bg-white flex items-center justify-center shrink-0">
+                        {o.logoUrl ? <img src={o.logoUrl} alt="" className="w-full h-full object-cover" /> : <Users className="w-5 h-5 text-slate-400" />}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">
+                          {o.name} {o.acronym ? `(${o.acronym})` : ''} {!o.isPublished && <span className="ml-1 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Hidden</span>}
+                        </h4>
+                        <p className="text-xs text-slate-500">Adviser: {o.adviser || '—'} · Head: {o.presidentOrHead || '—'}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEditingItem({ module: 'organizations', isNew: false, data: JSON.parse(JSON.stringify(o)) })} className="p-1.5 hover:bg-slate-200 rounded">
+                        <Edit2 className="w-4 h-4 text-slate-600" />
+                      </button>
+                      <button onClick={() => triggerDelete(o.name, () => store.deleteOrganization(o.id))} className="p-1.5 hover:bg-red-100 rounded">
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
                     </div>
@@ -1269,8 +1319,120 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </>
               )}
 
+              {editingItem.module === 'organizations' && (() => {
+                const d = editingItem.data;
+                const set = (patch: any) => setEditingItem({ ...editingItem, data: { ...d, ...patch } });
+                const inp = 'w-full px-3 py-2 border border-slate-300 rounded-lg';
+                const lbl = 'block font-bold text-slate-700 mb-1';
+                const rowBtn = 'text-[11px] font-semibold text-red-600 hover:text-red-700';
+                const addBtn = 'text-[11px] font-bold text-blue-900 hover:text-blue-700';
+                const officers: any[] = d.officers || [];
+                const acts: any[] = d.recentActivities || [];
+                const anns: any[] = d.announcements || [];
+                const upd = (key: string, list: any[], i: number, patch: any) =>
+                  set({ [key]: list.map((x, idx) => (idx === i ? { ...x, ...patch } : x)) });
+                const del = (key: string, list: any[], i: number) =>
+                  set({ [key]: list.filter((_, idx) => idx !== i) });
+                return (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={lbl}>Organization Name</label>
+                        <input type="text" value={d.name || ''} onChange={(e) => set({ name: e.target.value })} className={inp} />
+                      </div>
+                      <div>
+                        <label className={lbl}>Acronym</label>
+                        <input type="text" value={d.acronym || ''} onChange={(e) => set({ acronym: e.target.value })} className={inp} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={lbl}>Code (short unique ID, e.g. SSLG)</label>
+                      <input type="text" value={d.code || ''} onChange={(e) => set({ code: e.target.value })} className={inp + ' font-mono'} />
+                    </div>
+                    <div>
+                      <label className={lbl}>Description</label>
+                      <textarea rows={3} value={d.description || ''} onChange={(e) => set({ description: e.target.value })} className={inp} />
+                    </div>
+                    <div>
+                      <label className={lbl}>Objectives (one per line)</label>
+                      <textarea rows={4} value={(d.objectives || []).join('\n')} onChange={(e) => set({ objectives: e.target.value.split('\n') })} className={inp} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={lbl}>Adviser</label>
+                        <input type="text" value={d.adviser || ''} onChange={(e) => set({ adviser: e.target.value })} className={inp} />
+                      </div>
+                      <div>
+                        <label className={lbl}>President / Head</label>
+                        <input type="text" value={d.presidentOrHead || ''} onChange={(e) => set({ presidentOrHead: e.target.value })} className={inp} />
+                      </div>
+                    </div>
+                    <DriveUploadField
+                      label="Logo"
+                      showPreview
+                      value={d.logoUrl || ''}
+                      onChange={(url) => set({ logoUrl: url })}
+                    />
+
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-slate-700">Officers</label>
+                        <button type="button" className={addBtn} onClick={() => set({ officers: [...officers, { position: '', name: '', gradeLevel: '' }] })}>+ Add officer</button>
+                      </div>
+                      {officers.map((o, i) => (
+                        <div key={i} className="grid grid-cols-12 gap-2 items-center">
+                          <input placeholder="Position" value={o.position} onChange={(e) => upd('officers', officers, i, { position: e.target.value })} className={inp + ' col-span-4'} />
+                          <input placeholder="Name" value={o.name} onChange={(e) => upd('officers', officers, i, { name: e.target.value })} className={inp + ' col-span-4'} />
+                          <input placeholder="Grade" value={o.gradeLevel} onChange={(e) => upd('officers', officers, i, { gradeLevel: e.target.value })} className={inp + ' col-span-3'} />
+                          <button type="button" className={rowBtn + ' col-span-1'} onClick={() => del('officers', officers, i)}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-slate-700">Recent Activities</label>
+                        <button type="button" className={addBtn} onClick={() => set({ recentActivities: [...acts, { title: '', date: new Date().toISOString().split('T')[0], description: '' }] })}>+ Add activity</button>
+                      </div>
+                      {acts.map((a, i) => (
+                        <div key={i} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                          <div className="grid grid-cols-12 gap-2">
+                            <input placeholder="Title" value={a.title} onChange={(e) => upd('recentActivities', acts, i, { title: e.target.value })} className={inp + ' col-span-7'} />
+                            <input type="date" value={a.date} onChange={(e) => upd('recentActivities', acts, i, { date: e.target.value })} className={inp + ' col-span-5'} />
+                          </div>
+                          <textarea rows={2} placeholder="Description" value={a.description} onChange={(e) => upd('recentActivities', acts, i, { description: e.target.value })} className={inp} />
+                          <button type="button" className={rowBtn} onClick={() => del('recentActivities', acts, i)}>Remove</button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-slate-700">Announcements</label>
+                        <button type="button" className={addBtn} onClick={() => set({ announcements: [...anns, { title: '', date: new Date().toISOString().split('T')[0], content: '' }] })}>+ Add announcement</button>
+                      </div>
+                      {anns.map((a, i) => (
+                        <div key={i} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                          <div className="grid grid-cols-12 gap-2">
+                            <input placeholder="Title" value={a.title} onChange={(e) => upd('announcements', anns, i, { title: e.target.value })} className={inp + ' col-span-7'} />
+                            <input type="date" value={a.date} onChange={(e) => upd('announcements', anns, i, { date: e.target.value })} className={inp + ' col-span-5'} />
+                          </div>
+                          <textarea rows={2} placeholder="Content" value={a.content} onChange={(e) => upd('announcements', anns, i, { content: e.target.value })} className={inp} />
+                          <button type="button" className={rowBtn} onClick={() => del('announcements', anns, i)}>Remove</button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <label className="flex items-center gap-2 pt-2 border-t border-slate-100 text-slate-700 font-semibold">
+                      <input type="checkbox" checked={d.isPublished !== false} onChange={(e) => set({ isPublished: e.target.checked })} />
+                      Published (visible on the public website)
+                    </label>
+                  </>
+                );
+              })()}
+
               {/* General fallback save for other entities */}
-              {!['news', 'issuances', 'users', 'org-chart'].includes(editingItem.module) && (
+              {!['news', 'issuances', 'users', 'org-chart', 'organizations'].includes(editingItem.module) && (
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Title / Name</label>
                   <input
@@ -1288,7 +1450,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               )}
 
-              {!['news', 'issuances', 'users', 'org-chart'].includes(editingItem.module) && editingItem.data.imageUrl !== undefined && (
+              {!['news', 'issuances', 'users', 'org-chart', 'organizations'].includes(editingItem.module) && editingItem.data.imageUrl !== undefined && (
                 <DriveUploadField
                   label="Image"
                   showPreview
@@ -1326,6 +1488,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       store.saveEvent(editingItem.data);
                     } else if (editingItem.module === 'org-chart') {
                       store.saveOrgChartNode(editingItem.data);
+                    } else if (editingItem.module === 'organizations') {
+                      const o = editingItem.data;
+                      if (!o.name?.trim()) throw new Error('Organization name is required.');
+                      store.saveOrganization({
+                        ...o,
+                        code: (o.code || o.acronym || o.name).trim(),
+                        objectives: (o.objectives || []).map((x: string) => x.trim()).filter(Boolean),
+                      });
                     } else if (editingItem.module === 'updates') {
                       store.saveSchoolUpdate(editingItem.data);
                     } else if (editingItem.module === 'monitoring') {
