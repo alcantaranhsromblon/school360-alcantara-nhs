@@ -457,6 +457,105 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
 
+                <div className="pt-4 border-t border-slate-100 space-y-4">
+                  <h3 className="text-sm font-bold text-blue-900">Contact, Location & Social</h3>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">School Location / Address</label>
+                    <textarea
+                      rows={2}
+                      value={schoolProfile.address}
+                      onChange={(e) => setSchoolProfile({ ...schoolProfile, address: e.target.value })}
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg"
+                    />
+                    <p className="mt-1 text-[11px] text-slate-500">Shown on the website, footer and the Google Map. The map follows this address automatically.</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Custom Google Maps embed link (optional)</label>
+                    <input
+                      type="text"
+                      value={schoolProfile.mapUrl || ''}
+                      onChange={(e) => setSchoolProfile({ ...schoolProfile, mapUrl: e.target.value })}
+                      placeholder="Google Maps → Share → Embed a map → paste the iframe code or its src link"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Official Email</label>
+                      <input
+                        type="email"
+                        value={schoolProfile.email}
+                        onChange={(e) => setSchoolProfile({ ...schoolProfile, email: e.target.value })}
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Contact Number</label>
+                      <input
+                        type="text"
+                        value={schoolProfile.contactNumber}
+                        onChange={(e) => setSchoolProfile({ ...schoolProfile, contactNumber: e.target.value })}
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">School Facebook Page</label>
+                    <input
+                      type="text"
+                      value={schoolProfile.facebookPage}
+                      onChange={(e) => setSchoolProfile({ ...schoolProfile, facebookPage: e.target.value })}
+                      placeholder="https://www.facebook.com/your-school-page"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono"
+                    />
+                    <p className="mt-1 text-[11px] text-slate-500">Paste the full page link. It becomes a clickable link on the website.</p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-3">
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Tagline</label>
+                      <input
+                        type="text"
+                        value={schoolProfile.tagline}
+                        onChange={(e) => setSchoolProfile({ ...schoolProfile, tagline: e.target.value })}
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Year Established</label>
+                      <input
+                        type="number"
+                        value={schoolProfile.establishedYear}
+                        onChange={(e) => setSchoolProfile({ ...schoolProfile, establishedYear: Number(e.target.value) })}
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Land Area</label>
+                      <input
+                        type="text"
+                        value={schoolProfile.landArea}
+                        onChange={(e) => setSchoolProfile({ ...schoolProfile, landArea: e.target.value })}
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Region</label>
+                      <input
+                        type="text"
+                        value={schoolProfile.region}
+                        onChange={(e) => setSchoolProfile({ ...schoolProfile, region: e.target.value })}
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                  <DriveUploadField
+                    label="Homepage background photo (leave empty to use the default school building photo)"
+                    showPreview
+                    value={schoolProfile.heroImageUrl || ''}
+                    onChange={(url) => setSchoolProfile({ ...schoolProfile, heroImageUrl: url })}
+                  />
+                </div>
+
                 <div className="pt-4 border-t border-slate-100 flex justify-end">
                   <button
                     type="submit"

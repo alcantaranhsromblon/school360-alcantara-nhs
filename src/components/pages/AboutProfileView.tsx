@@ -1,6 +1,7 @@
 import React from 'react';
 import { Building, Users, BookOpen, Award, MapPin, Mail, Phone, Calendar, Globe, GraduationCap } from 'lucide-react';
 import { Breadcrumb } from '../common/Breadcrumb';
+import { mapEmbedUrl, mapOpenUrl, facebookUrl } from '../../lib/maps';
 import { store } from '../../services/store';
 
 interface AboutProfileViewProps {
@@ -176,9 +177,29 @@ export const AboutProfileView: React.FC<AboutProfileViewProps> = ({ onNavigate }
               </div>
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-blue-900 shrink-0" />
-                <span>{profile.facebookPage}</span>
+                {profile.facebookPage ? (
+                  <a href={facebookUrl(profile.facebookPage)} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline break-all">
+                    {profile.facebookPage}
+                  </a>
+                ) : <span>—</span>}
               </div>
             </div>
+            {profile.address && (
+              <div className="space-y-2 pt-1">
+                <div className="rounded-lg overflow-hidden border border-slate-200">
+                  <iframe
+                    title="School location map"
+                    src={mapEmbedUrl(profile.address, profile.mapUrl)}
+                    className="w-full h-56 border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                <a href={mapOpenUrl(profile.address)} target="_blank" rel="noreferrer" className="text-xs font-semibold text-blue-700 hover:underline">
+                  Open in Google Maps →
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>

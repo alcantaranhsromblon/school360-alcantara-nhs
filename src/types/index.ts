@@ -44,6 +44,10 @@ export interface SchoolProfileData {
   totalTeachers: number;
   totalClassrooms: number;
   landArea: string;
+  /** Optional: custom Google Maps embed link (otherwise the map is built from the address) */
+  mapUrl?: string;
+  /** Optional: homepage hero background photo (defaults to /hero.jpg) */
+  heroImageUrl?: string;
   /** Editable page content (optional: the website falls back to built-in text when missing) */
   history?: HistoryContent;
   deped?: DepedContent;

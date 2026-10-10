@@ -2,6 +2,7 @@ import React from 'react';
 import { Mail, Phone, MapPin, ExternalLink, Shield } from 'lucide-react';
 import { store } from '../../services/store';
 import { defaultFooter } from '../../data/pageDefaults';
+import { mapOpenUrl, facebookUrl } from '../../lib/maps';
 
 interface FooterProps {
   onNavigate: (view: string, subParam?: string) => void;
@@ -34,7 +35,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
             <div className="pt-2 text-xs text-slate-400 space-y-1.5">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>{profile.address}</span>
+                <a href={mapOpenUrl(profile.address)} target="_blank" rel="noreferrer" className="hover:text-amber-300">{profile.address}</a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-400 shrink-0" />
@@ -127,7 +128,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
               <div>{footer.regionLine}</div>
               {profile.facebookPage && (
                 <div className="flex items-center gap-1 hover:text-slate-400">
-                  <a href={/^https?:/.test(profile.facebookPage) ? profile.facebookPage : `https://${profile.facebookPage}`} target="_blank" rel="noreferrer" className="flex items-center gap-1">
+                  <a href={facebookUrl(profile.facebookPage)} target="_blank" rel="noreferrer" className="flex items-center gap-1">
                     <span>Official Facebook Page</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>

@@ -18,6 +18,7 @@ import {
   Eye
 } from 'lucide-react';
 import { store } from '../../services/store';
+import { toImageUrl } from '../../lib/drive';
 import { NewsItem, SchoolEvent, AwardItem, Campus, SchoolOrganization } from '../../types';
 
 interface HomeViewProps {
@@ -40,15 +41,16 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
     <div className="space-y-12 pb-16">
       {/* HERO SECTION */}
       <section className="relative bg-slate-900 text-white overflow-hidden">
-        {/* Background photo overlay */}
-        <div className="absolute inset-0 z-0 opacity-25 mix-blend-overlay">
+        {/* Background photo */}
+        <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=2000&q=80"
-            alt="Alcantara National High School Grounds"
-            className="w-full h-full object-cover"
+            src={profile.heroImageUrl ? toImageUrl(profile.heroImageUrl, 2000) : '/hero.jpg'}
+            alt="Alcantara National High School building"
+            className="w-full h-full object-cover object-center"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-950 via-blue-900/90 to-slate-900/80 z-1" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/95 via-blue-900/75 to-blue-900/25 z-[1]" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/50 to-transparent z-[1]" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-24">
           <div className="max-w-3xl space-y-6">
