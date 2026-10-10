@@ -1,6 +1,7 @@
 import React from 'react';
 import { Mail, Phone, MapPin, ExternalLink, Shield } from 'lucide-react';
 import { store } from '../../services/store';
+import { defaultFooter } from '../../data/pageDefaults';
 
 interface FooterProps {
   onNavigate: (view: string, subParam?: string) => void;
@@ -9,6 +10,8 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
   const profile = store.getSchoolProfile();
+  const footer = { ...defaultFooter(profile.tagline), ...(profile.footer || {}) };
+  const orgs = store.getOrganizations();
 
   return (
     <footer className="bg-slate-900 text-slate-300 text-sm border-t-4 border-amber-500">
@@ -20,13 +23,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="Alcantara National High School seal" className="w-12 h-12 object-contain shrink-0" />
               <div>
-                <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">DepEd Romblon</div>
-                <div className="text-sm font-extrabold text-white leading-tight">Alcantara National High School</div>
-                <div className="text-[11px] text-slate-400 font-mono">School ID: 301747</div>
+                <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">{profile.division}</div>
+                <div className="text-sm font-extrabold text-white leading-tight">{profile.schoolName}</div>
+                <div className="text-[11px] text-slate-400 font-mono">School ID: {profile.schoolId}</div>
               </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              {profile.tagline}. An institution committed to the holistic growth of learners under the DepEd MATATAG agenda.
+              {footer.about}
             </p>
             <div className="pt-2 text-xs text-slate-400 space-y-1.5">
               <div className="flex items-start gap-2">
@@ -84,26 +87,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
               Learner Organizations
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li>
-                <button onClick={() => onNavigate('organization', 'SSLG')} className="hover:text-amber-400 transition-colors">
-                  Supreme Secondary Learner Government (SSLG)
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('organization', 'YES-O')} className="hover:text-amber-400 transition-colors">
-                  Youth for Environment in Schools (YES-O)
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('organization', 'THE_BEACON')} className="hover:text-amber-400 transition-colors">
-                  The Beacon (English Publication)
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('organization', 'AVANT_GARDE')} className="hover:text-amber-400 transition-colors">
-                  Avant Garde / Ang Gabay (Filipino Publication)
-                </button>
-              </li>
+              {orgs.map(o => (
+                <li key={o.id}>
+                  <button onClick={() => onNavigate('organization', o.code)} className="hover:text-amber-400 transition-colors text-left">
+                    {o.name}{o.acronym ? ` (${o.acronym})` : ''}
+                  </button>
+                </li>
+              ))}
               <li>
                 <button onClick={() => onNavigate('awards')} className="hover:text-amber-400 transition-colors">
                   Honors & Student Recognitions
@@ -123,7 +113,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
                 <span>Faculty & Admin Portal</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Authorized DepEd personnel can log in to view School Issuances, internal updates, and submit monitoring forms.
+                {footer.portalNote}
               </p>
               <button
                 onClick={onOpenLogin}
@@ -134,7 +124,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
             </div>
 
             <div className="pt-2 text-[11px] text-slate-500 space-y-1">
-              <div>Region IV-B MIMAROPA · SDO Romblon</div>
+              <div>{footer.regionLine}</div>
+              {profile.facebookPage && (
+                <div className="flex items-center gap-1 hover:text-slate-400">
+                  <a href={/^https?:/.test(profile.facebookPage) ? profile.facebookPage : `https://${profile.facebookPage}`} target="_blank" rel="noreferrer" className="flex items-center gap-1">
+                    <span>Official Facebook Page</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
               <div className="flex items-center gap-1 hover:text-slate-400">
                 <a href="https://www.deped.gov.ph" target="_blank" rel="noreferrer" className="flex items-center gap-1">
                   <span>DepEd Central Office Portal</span>
@@ -150,7 +148,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
       <div className="bg-slate-950 py-4 px-4 sm:px-8 border-t border-slate-800 text-[11px] text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div>
-            © {new Date().getFullYear()} Alcantara National High School · School ID 301747 · All Rights Reserved.
+            © {new Date().getFullYear()} {profile.schoolName} · School ID {profile.schoolId} · All Rights Reserved.
           </div>
           <div className="flex items-center gap-4 text-slate-400">
             <span>DepEd MATATAG</span>

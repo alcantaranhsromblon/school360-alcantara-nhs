@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DriveUploadField } from '../common/DriveUploadField';
 import { formatBytes } from '../../lib/driveUpload';
 import { toImageUrl } from '../../lib/drive';
+import { defaultHistory, defaultDeped, defaultFooter } from '../../data/pageDefaults';
 import {
   LayoutDashboard,
   Building,
@@ -30,7 +31,9 @@ import {
   AlertTriangle,
   Eye,
   Archive,
-  Download
+  Download,
+  History as HistoryIcon,
+  Flag
 } from 'lucide-react';
 import { store } from '../../services/store';
 import { useAuth } from '../../context/AuthContext';
@@ -154,6 +157,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     });
   };
 
+  // Save editable page content (History / DepEd / Footer) stored with the school profile
+  const savePages = (msg: string) => {
+    try {
+      store.updateSchoolProfile(schoolProfile);
+      refreshAll();
+      showNotification(msg);
+    } catch (err: any) {
+      alert(err?.message || 'Error saving');
+    }
+  };
+
   // Profile Save
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,6 +228,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {[
             { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard },
             { id: 'profile', label: 'School Profile', icon: Building },
+            { id: 'history', label: 'School History Page', icon: HistoryIcon },
+            { id: 'deped', label: 'DepEd Pages (Vision, Mission…)', icon: Flag },
+            { id: 'footer', label: 'Website Footer', icon: Building },
             { id: 'campuses', label: 'Campuses', icon: Building },
             { id: 'news', label: 'News & Updates', icon: BookOpen },
             { id: 'awards', label: 'Awards & Honors', icon: Award },
@@ -704,6 +721,150 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
           )}
+
+          {/* PAGE CONTENT EDITORS: History / DepEd / Footer */}
+          {activeModule === 'history' && (() => {
+            const h = schoolProfile.history ?? defaultHistory;
+            const set = (patch: any) => setSchoolProfile({ ...schoolProfile, history: { ...h, ...patch } });
+            const ms = h.milestones ?? [];
+            const updM = (i: number, patch: any) => set({ milestones: ms.map((m, idx) => (idx === i ? { ...m, ...patch } : m)) });
+            const move = (i: number, dir: number) => {
+              const j = i + dir; if (j < 0 || j >= ms.length) return;
+              const copy = [...ms]; [copy[i], copy[j]] = [copy[j], copy[i]]; set({ milestones: copy });
+            };
+            const inp = 'w-full px-3 py-2 text-xs border border-slate-300 rounded-lg';
+            return (
+              <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
+                <div className="border-b border-slate-100 pb-4">
+                  <h2 className="text-lg font-bold text-slate-900">Edit School History Page</h2>
+                  <p className="text-xs text-slate-500">Changes appear under About Us → School History after you click Save.</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Banner sentence</label>
+                  <textarea rows={2} value={h.banner} onChange={(e) => set({ banner: e.target.value })} className={inp} />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Intro under "Chronology of Growth & Service"</label>
+                  <textarea rows={2} value={h.intro} onChange={(e) => set({ intro: e.target.value })} className={inp} />
+                </div>
+                <div className="space-y-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700">Timeline milestones ({ms.length})</label>
+                    <button type="button" className="text-xs font-bold text-blue-900 hover:text-blue-700" onClick={() => set({ milestones: [...ms, { year: '', title: '', description: '' }] })}>+ Add milestone</button>
+                  </div>
+                  {ms.map((m, i) => (
+                    <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                      <div className="grid grid-cols-12 gap-2">
+                        <input placeholder="Year" value={m.year} onChange={(e) => updM(i, { year: e.target.value })} className={inp + ' col-span-3 font-mono'} />
+                        <input placeholder="Title" value={m.title} onChange={(e) => updM(i, { title: e.target.value })} className={inp + ' col-span-9'} />
+                      </div>
+                      <textarea rows={3} placeholder="Description" value={m.description} onChange={(e) => updM(i, { description: e.target.value })} className={inp} />
+                      <div className="flex gap-3 text-[11px] font-semibold">
+                        <button type="button" className="text-slate-600 hover:text-slate-900" onClick={() => move(i, -1)}>↑ Move up</button>
+                        <button type="button" className="text-slate-600 hover:text-slate-900" onClick={() => move(i, 1)}>↓ Move down</button>
+                        <button type="button" className="text-red-600 hover:text-red-700 ml-auto" onClick={() => set({ milestones: ms.filter((_, idx) => idx !== i) })}>Remove</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <button type="button" className="text-xs font-semibold text-slate-500 hover:text-slate-800" onClick={() => setSchoolProfile({ ...schoolProfile, history: JSON.parse(JSON.stringify(defaultHistory)) })}>Restore original text</button>
+                  <button type="button" onClick={() => savePages('School history page saved.')} className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold rounded-lg">Save History</button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {activeModule === 'deped' && (() => {
+            const d = schoolProfile.deped ?? defaultDeped;
+            const set = (patch: any) => setSchoolProfile({ ...schoolProfile, deped: { ...d, ...patch } });
+            const mp = d.missionPoints ?? [];
+            const cv = d.coreValues ?? [];
+            const inp = 'w-full px-3 py-2 text-xs border border-slate-300 rounded-lg';
+            const lbl = 'block text-xs font-bold text-slate-700 mb-1';
+            const sec = 'space-y-3 pt-4 border-t border-slate-100';
+            return (
+              <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
+                <div className="border-b border-slate-100 pb-4">
+                  <h2 className="text-lg font-bold text-slate-900">Edit DepEd Pages</h2>
+                  <p className="text-xs text-slate-500">Vision, Mission, Core Values and Mandate under About Us → DepEd. Leave a blank line between paragraphs. Use **double asterisks** for bold.</p>
+                </div>
+
+                <div className={sec}>
+                  <h3 className="text-sm font-bold text-blue-900">Vision</h3>
+                  <div><label className={lbl}>Vision statement</label><textarea rows={5} value={d.vision} onChange={(e) => set({ vision: e.target.value })} className={inp} /></div>
+                  <div><label className={lbl}>"Vision Realization in Alcantara NHS" note</label><textarea rows={3} value={d.visionNote} onChange={(e) => set({ visionNote: e.target.value })} className={inp} /></div>
+                </div>
+
+                <div className={sec}>
+                  <h3 className="text-sm font-bold text-blue-900">Mission</h3>
+                  <div><label className={lbl}>Mission opening sentence</label><textarea rows={2} value={d.missionIntro} onChange={(e) => set({ missionIntro: e.target.value })} className={inp} /></div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700">Mission points ({mp.length})</label>
+                    <button type="button" className="text-xs font-bold text-blue-900 hover:text-blue-700" onClick={() => set({ missionPoints: [...mp, { title: '', text: '' }] })}>+ Add point</button>
+                  </div>
+                  {mp.map((m, i) => (
+                    <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                      <input placeholder="Heading (e.g. Teachers)" value={m.title} onChange={(e) => set({ missionPoints: mp.map((x, idx) => idx === i ? { ...x, title: e.target.value } : x) })} className={inp} />
+                      <textarea rows={2} placeholder="Text" value={m.text} onChange={(e) => set({ missionPoints: mp.map((x, idx) => idx === i ? { ...x, text: e.target.value } : x) })} className={inp} />
+                      <button type="button" className="text-[11px] font-semibold text-red-600 hover:text-red-700" onClick={() => set({ missionPoints: mp.filter((_, idx) => idx !== i) })}>Remove</button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className={sec}>
+                  <h3 className="text-sm font-bold text-blue-900">Core Values</h3>
+                  <div><label className={lbl}>Intro sentence</label><textarea rows={2} value={d.valuesIntro} onChange={(e) => set({ valuesIntro: e.target.value })} className={inp} /></div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700">Values ({cv.length})</label>
+                    <button type="button" className="text-xs font-bold text-blue-900 hover:text-blue-700" onClick={() => set({ coreValues: [...cv, { title: '', description: '' }] })}>+ Add value</button>
+                  </div>
+                  {cv.map((v, i) => (
+                    <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                      <input placeholder="Value name" value={v.title} onChange={(e) => set({ coreValues: cv.map((x, idx) => idx === i ? { ...x, title: e.target.value } : x) })} className={inp} />
+                      <textarea rows={3} placeholder="Description" value={v.description} onChange={(e) => set({ coreValues: cv.map((x, idx) => idx === i ? { ...x, description: e.target.value } : x) })} className={inp} />
+                      <button type="button" className="text-[11px] font-semibold text-red-600 hover:text-red-700" onClick={() => set({ coreValues: cv.filter((_, idx) => idx !== i) })}>Remove</button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className={sec}>
+                  <h3 className="text-sm font-bold text-blue-900">Mandate</h3>
+                  <div><label className={lbl}>Mandate text</label><textarea rows={8} value={d.mandate} onChange={(e) => set({ mandate: e.target.value })} className={inp} /></div>
+                  <div><label className={lbl}>Legal framework line</label><textarea rows={2} value={d.legalFramework} onChange={(e) => set({ legalFramework: e.target.value })} className={inp} /></div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <button type="button" className="text-xs font-semibold text-slate-500 hover:text-slate-800" onClick={() => setSchoolProfile({ ...schoolProfile, deped: JSON.parse(JSON.stringify(defaultDeped)) })}>Restore original text</button>
+                  <button type="button" onClick={() => savePages('DepEd pages saved.')} className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold rounded-lg">Save DepEd Pages</button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {activeModule === 'footer' && (() => {
+            const f = { ...defaultFooter(schoolProfile.tagline), ...(schoolProfile.footer || {}) };
+            const set = (patch: any) => setSchoolProfile({ ...schoolProfile, footer: { ...f, ...patch } });
+            const inp = 'w-full px-3 py-2 text-xs border border-slate-300 rounded-lg';
+            const lbl = 'block text-xs font-bold text-slate-700 mb-1';
+            return (
+              <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
+                <div className="border-b border-slate-100 pb-4">
+                  <h2 className="text-lg font-bold text-slate-900">Edit Website Footer</h2>
+                  <p className="text-xs text-slate-500">
+                    The school name, ID, address, email, phone and Facebook link in the footer come from <b>School Profile</b>. Organization links come from <b>School Organizations</b>.
+                  </p>
+                </div>
+                <div><label className={lbl}>About text (under the school name)</label><textarea rows={3} value={f.about} onChange={(e) => set({ about: e.target.value })} className={inp} /></div>
+                <div><label className={lbl}>Region / division line</label><input type="text" value={f.regionLine} onChange={(e) => set({ regionLine: e.target.value })} className={inp} /></div>
+                <div><label className={lbl}>Faculty & Admin Portal note</label><textarea rows={3} value={f.portalNote} onChange={(e) => set({ portalNote: e.target.value })} className={inp} /></div>
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <button type="button" className="text-xs font-semibold text-slate-500 hover:text-slate-800" onClick={() => setSchoolProfile({ ...schoolProfile, footer: defaultFooter(schoolProfile.tagline) })}>Restore original text</button>
+                  <button type="button" onClick={() => savePages('Footer saved.')} className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold rounded-lg">Save Footer</button>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* OTHER MODULE PLACEHOLDERS / FORMS */}
           {['campuses', 'awards', 'programs', 'events', 'gallery', 'org-chart', 'organizations', 'updates', 'monitoring'].includes(activeModule) && (

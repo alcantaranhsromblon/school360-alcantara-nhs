@@ -44,6 +44,33 @@ export interface SchoolProfileData {
   totalTeachers: number;
   totalClassrooms: number;
   landArea: string;
+  /** Editable page content (optional: the website falls back to built-in text when missing) */
+  history?: HistoryContent;
+  deped?: DepedContent;
+  footer?: FooterContent;
+}
+
+export interface HistoryContent {
+  banner: string;
+  intro: string;
+  milestones: { year: string; title: string; description: string }[];
+}
+
+export interface DepedContent {
+  vision: string;
+  visionNote: string;
+  missionIntro: string;
+  missionPoints: { title: string; text: string }[];
+  valuesIntro: string;
+  coreValues: { title: string; description: string }[];
+  mandate: string;
+  legalFramework: string;
+}
+
+export interface FooterContent {
+  about: string;
+  regionLine: string;
+  portalNote: string;
 }
 
 export interface Campus {

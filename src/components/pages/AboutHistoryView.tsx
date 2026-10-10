@@ -1,44 +1,16 @@
 import React from 'react';
 import { History, Award, BookOpen, Flag, CheckCircle } from 'lucide-react';
 import { Breadcrumb } from '../common/Breadcrumb';
+import { store } from '../../services/store';
+import { defaultHistory } from '../../data/pageDefaults';
 
 interface AboutHistoryViewProps {
   onNavigate: (view: string, subParam?: string) => void;
 }
 
 export const AboutHistoryView: React.FC<AboutHistoryViewProps> = ({ onNavigate }) => {
-  const milestones = [
-    {
-      year: '1968',
-      title: 'Founding of Alcantara Municipal High School',
-      description: 'Established through the collaborative efforts of local municipal leaders, civic stakeholders, and community elders to offer secondary education to children in Alcantara who previously had to travel to Odiongan or Romblon town.'
-    },
-    {
-      year: '1984',
-      title: 'Conversion to National High School',
-      description: 'By virtue of national legislation and DepEd integration, the school was converted into a full National High School (ANHS), securing regular national budgetary appropriations and instructional facility allocations.'
-    },
-    {
-      year: '1998',
-      title: 'Establishment of San Agustin Annex Campus',
-      description: 'To address access challenges for learners from remote coastal and agricultural sitios, the San Agustin Extension Campus was established, bringing basic education closer to remote learners.'
-    },
-    {
-      year: '2016',
-      title: 'Senior High School Implementation & Expansion',
-      description: 'Pioneered the full roll-out of Republic Act 10533 (Enhanced Basic Education Act), erecting the Senior High School complex with Academic tracks (STEM, ABM, HUMSS) and TVL specialization suites.'
-    },
-    {
-      year: '2023',
-      title: 'Attainment of SBM Level III (Advanced Maturing Practitioner)',
-      description: 'DepEd Regional Office IV-B MIMAROPA conferred the Level III School-Based Management distinction to Alcantara NHS for exemplary leadership, accountability, and community engagement.'
-    },
-    {
-      year: 'Present',
-      title: 'Digital Transformation & Sustainable Green Campus',
-      description: 'Continuing the DepEd MATATAG agenda through Project TULAY, science and robotics programs, digital learning caches, and the School360 unified web and management portal.'
-    }
-  ];
+  const history = store.getSchoolProfile().history ?? defaultHistory;
+  const milestones = history.milestones ?? [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
@@ -61,7 +33,7 @@ export const AboutHistoryView: React.FC<AboutHistoryViewProps> = ({ onNavigate }
             History of Alcantara National High School
           </h1>
           <p className="text-sm sm:text-base text-blue-100 font-light leading-relaxed">
-            From humble municipal beginnings in 1968 to an award-winning center of academic and technical excellence in the Division of Romblon.
+            {history.banner}
           </p>
         </div>
       </div>
@@ -73,7 +45,7 @@ export const AboutHistoryView: React.FC<AboutHistoryViewProps> = ({ onNavigate }
             Chronology of Growth & Service
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Over fifty years of dedication to shaping the youth of Alcantara and neighboring municipalities.
+            {history.intro}
           </p>
         </div>
 
