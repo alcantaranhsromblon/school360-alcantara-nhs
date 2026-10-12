@@ -305,7 +305,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
                 <div>
                   <div className="flex items-center gap-2 text-[11px] text-slate-400 mb-2">
                     <Clock className="w-3 h-3" />
-                    <span>{item.publishedDate}</span>{item.writer && (
+                    <span>{item.publishedDate}</span>{item.section && (
+                    <>
+                      <span>·</span>
+                      <span className="font-semibold text-blue-900">{item.section}</span>
+                    </>
+                    )}{item.writer && (
                     <>
                       <span>·</span>
                       <span>Writer: {item.writer}</span>
@@ -579,6 +584,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
             <div className="p-5 sm:p-8 md:p-10 w-full max-w-5xl mx-auto space-y-5">
               <div className="text-xs text-slate-400 flex items-center gap-2">
                 <span>{selectedNews.publishedDate}</span>
+                {selectedNews.section && (
+                <>
+                  <span>·</span>
+                  <span className="font-semibold text-blue-900">{selectedNews.section}</span>
+                </>
+                )}
                 {selectedNews.writer && (
                 <>
                   <span>·</span>

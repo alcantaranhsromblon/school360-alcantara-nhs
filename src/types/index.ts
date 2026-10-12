@@ -142,6 +142,8 @@ export interface NewsItem {
   author: string;
   /** Name shown publicly as the article's writer */
   writer?: string;
+  /** Publication section: Feature, News, Science-Tech, Sports or Editorial */
+  section?: string;
   publishedDate: string;
   imageUrl: string;
   isPublished: boolean;
