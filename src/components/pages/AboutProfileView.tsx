@@ -14,6 +14,16 @@ export const AboutProfileView: React.FC<AboutProfileViewProps> = ({ onNavigate }
   const curricular = profile.curricularPrograms && profile.curricularPrograms.length > 0
     ? profile.curricularPrograms
     : defaultCurricularPrograms;
+  const demo = profile.demographics;
+  const sum = (xs: number[]) => xs.reduce((a, b) => a + (b || 0), 0);
+  const hasDemo = !!demo && (
+    (demo.sections || []).length > 0 ||
+    (demo.learnersByCampus || []).some(r => r.male || r.female) ||
+    (demo.personnelByCampus || []).some(r => r.facultyMale || r.facultyFemale || r.staffMale || r.staffFemale)
+  );
+  const th = 'px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wide text-slate-500';
+  const td = 'px-3 py-2 text-xs text-slate-700';
+  const tdn = 'px-3 py-2 text-xs text-slate-700 text-right font-mono';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
@@ -113,6 +123,105 @@ export const AboutProfileView: React.FC<AboutProfileViewProps> = ({ onNavigate }
               ))}
             </div>
           </div>
+
+          {/* Demographic Profile */}
+          {hasDemo && demo && (
+            <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-xs">
+              <h2 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-900" />
+                <span>Demographic Profile</span>
+              </h2>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-bold text-blue-950">Learners per Campus</h3>
+                <div className="overflow-x-auto rounded-lg border border-slate-200">
+                  <table className="w-full min-w-[360px]">
+                    <thead className="bg-slate-50">
+                      <tr><th className={th}>Campus</th><th className={th + ' text-right'}>Male</th><th className={th + ' text-right'}>Female</th><th className={th + ' text-right'}>Total</th></tr>
+                    </thead>
+                    <tbody>
+                      {demo.learnersByCampus.map((r, i) => (
+                        <tr key={i} className="border-t border-slate-100">
+                          <td className={td}>{r.campus}</td>
+                          <td className={tdn}>{r.male}</td>
+                          <td className={tdn}>{r.female}</td>
+                          <td className={tdn + ' font-bold'}>{r.male + r.female}</td>
+                        </tr>
+                      ))}
+                      <tr className="border-t border-slate-200 bg-slate-50 font-bold">
+                        <td className={td + ' font-bold'}>All campuses</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.learnersByCampus.map(r => r.male))}</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.learnersByCampus.map(r => r.female))}</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.learnersByCampus.map(r => r.male + r.female))}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {demo.sections.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold text-blue-950">Learners per Section</h3>
+                  <div className="overflow-x-auto rounded-lg border border-slate-200">
+                    <table className="w-full min-w-[520px]">
+                      <thead className="bg-slate-50">
+                        <tr><th className={th}>Grade</th><th className={th}>Section</th><th className={th}>Campus</th><th className={th + ' text-right'}>Male</th><th className={th + ' text-right'}>Female</th><th className={th + ' text-right'}>Total</th></tr>
+                      </thead>
+                      <tbody>
+                        {demo.sections.map((r, i) => (
+                          <tr key={i} className="border-t border-slate-100">
+                            <td className={td}>{r.grade}</td>
+                            <td className={td + ' font-semibold'}>{r.section}</td>
+                            <td className={td}>{r.campus}</td>
+                            <td className={tdn}>{r.male}</td>
+                            <td className={tdn}>{r.female}</td>
+                            <td className={tdn + ' font-bold'}>{r.male + r.female}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-t border-slate-200 bg-slate-50">
+                          <td className={td + ' font-bold'} colSpan={3}>All sections</td>
+                          <td className={tdn + ' font-bold'}>{sum(demo.sections.map(r => r.male))}</td>
+                          <td className={tdn + ' font-bold'}>{sum(demo.sections.map(r => r.female))}</td>
+                          <td className={tdn + ' font-bold'}>{sum(demo.sections.map(r => r.male + r.female))}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-bold text-blue-950">Faculty and Staff per Campus</h3>
+                <div className="overflow-x-auto rounded-lg border border-slate-200">
+                  <table className="w-full min-w-[520px]">
+                    <thead className="bg-slate-50">
+                      <tr><th className={th}>Campus</th><th className={th + ' text-right'}>Faculty Male</th><th className={th + ' text-right'}>Faculty Female</th><th className={th + ' text-right'}>Staff Male</th><th className={th + ' text-right'}>Staff Female</th><th className={th + ' text-right'}>Total</th></tr>
+                    </thead>
+                    <tbody>
+                      {demo.personnelByCampus.map((r, i) => (
+                        <tr key={i} className="border-t border-slate-100">
+                          <td className={td}>{r.campus}</td>
+                          <td className={tdn}>{r.facultyMale}</td>
+                          <td className={tdn}>{r.facultyFemale}</td>
+                          <td className={tdn}>{r.staffMale}</td>
+                          <td className={tdn}>{r.staffFemale}</td>
+                          <td className={tdn + ' font-bold'}>{r.facultyMale + r.facultyFemale + r.staffMale + r.staffFemale}</td>
+                        </tr>
+                      ))}
+                      <tr className="border-t border-slate-200 bg-slate-50">
+                        <td className={td + ' font-bold'}>All campuses</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.personnelByCampus.map(r => r.facultyMale))}</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.personnelByCampus.map(r => r.facultyFemale))}</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.personnelByCampus.map(r => r.staffMale))}</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.personnelByCampus.map(r => r.staffFemale))}</td>
+                        <td className={tdn + ' font-bold'}>{sum(demo.personnelByCampus.map(r => r.facultyMale + r.facultyFemale + r.staffMale + r.staffFemale))}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Info */}

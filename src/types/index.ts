@@ -46,6 +46,8 @@ export interface SchoolProfileData {
   landArea: string;
   /** Editable curricular programs shown on School Profile (falls back to built-in list when missing) */
   curricularPrograms?: CurricularLevel[];
+  /** Learner and personnel headcounts by campus and section (editable by admins) */
+  demographics?: DemographicProfile;
   /** Optional: custom Google Maps embed link (otherwise the map is built from the address) */
   mapUrl?: string;
   /** Optional: homepage hero background photo (defaults to /hero.jpg) */
@@ -54,6 +56,34 @@ export interface SchoolProfileData {
   history?: HistoryContent;
   deped?: DepedContent;
   footer?: FooterContent;
+}
+
+export interface CampusHeadcount {
+  campus: string;
+  male: number;
+  female: number;
+}
+
+export interface PersonnelHeadcount {
+  campus: string;
+  facultyMale: number;
+  facultyFemale: number;
+  staffMale: number;
+  staffFemale: number;
+}
+
+export interface SectionRow {
+  grade: string;
+  section: string;
+  campus: string;
+  male: number;
+  female: number;
+}
+
+export interface DemographicProfile {
+  learnersByCampus: CampusHeadcount[];
+  sections: SectionRow[];
+  personnelByCampus: PersonnelHeadcount[];
 }
 
 export interface CurricularLevel {
@@ -87,7 +117,8 @@ export interface FooterContent {
 export interface Campus {
   id: string;
   name: string;
-  category: 'Main Campus' | 'Senior High School';
+  /** Optional: leave blank for campuses that need no label */
+  category: 'Main Campus' | 'Senior High School' | '';
   address: string;
   description: string;
   imageUrl: string;

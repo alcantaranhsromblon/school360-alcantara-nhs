@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DriveUploadField } from '../common/DriveUploadField';
 import { formatBytes } from '../../lib/driveUpload';
 import { toImageUrl } from '../../lib/drive';
-import { defaultHistory, defaultDeped, defaultFooter, defaultCurricularPrograms } from '../../data/pageDefaults';
+import { defaultHistory, defaultDeped, defaultFooter, defaultCurricularPrograms, defaultDemographics } from '../../data/pageDefaults';
 import {
   LayoutDashboard,
   Building,
@@ -52,7 +52,8 @@ import {
   ApprovedUser,
   Campus,
   SchoolProfileData,
-  CurricularLevel
+  CurricularLevel,
+  DemographicProfile
 } from '../../types';
 
 interface AdminDashboardProps {
@@ -172,14 +173,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Profile Save
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleaned: SchoolProfileData = schoolProfile.curricularPrograms
-      ? {
-          ...schoolProfile,
-          curricularPrograms: schoolProfile.curricularPrograms
-            .map(l => ({ level: l.level.trim(), programs: l.programs.map(x => x.trim()).filter(Boolean) }))
-            .filter(l => l.level || l.programs.length > 0),
-        }
-      : schoolProfile;
+    const cleaned: SchoolProfileData = { ...schoolProfile };
+    if (schoolProfile.curricularPrograms) {
+      cleaned.curricularPrograms = schoolProfile.curricularPrograms
+        .map(l => ({ level: l.level.trim(), programs: l.programs.map(x => x.trim()).filter(Boolean) }))
+        .filter(l => l.level || l.programs.length > 0);
+    }
+    if (schoolProfile.demographics) {
+      const d = schoolProfile.demographics;
+      cleaned.demographics = {
+        ...d,
+        sections: (d.sections || [])
+          .map(r => ({ ...r, grade: r.grade.trim(), section: r.section.trim() }))
+          .filter(r => r.section || r.grade || r.male || r.female),
+      };
+    }
     store.updateSchoolProfile(cleaned);
     setSchoolProfile(cleaned);
     refreshAll();
@@ -250,7 +258,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             { id: 'org-chart', label: 'Organizational Chart', icon: Users },
             { id: 'organizations', label: 'School Organizations', icon: Users },
             { id: 'issuances', label: 'School Issuances', icon: FileText, protected: true },
-            { id: 'updates', label: 'Internal Updates', icon: Bell, protected: true },
+            { id: 'updates', label: 'School Updates', icon: Bell, protected: true },
             { id: 'monitoring', label: 'School Monitoring', icon: CheckSquare, protected: true },
             { id: 'users', label: 'User Directory & Roles', icon: Shield },
             { id: 'audit', label: 'Audit Trail & Logs', icon: Activity }
@@ -602,6 +610,119 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             </button>
                           </div>
                         ))}
+                      </div>
+                    );
+                  })()}
+                  {/* Demographic Profile (shown on School Profile) */}
+                  {(() => {
+                    const demo: DemographicProfile = schoolProfile.demographics ?? defaultDemographics;
+                    const setDemo = (next: DemographicProfile) => setSchoolProfile({ ...schoolProfile, demographics: next });
+                    const num = (v: string) => Math.max(0, Math.floor(Number(v) || 0));
+                    const cell = 'w-20 px-2 py-1.5 text-xs text-right font-mono border border-slate-300 rounded';
+                    const text = 'w-full px-2 py-1.5 text-xs border border-slate-300 rounded';
+                    const th = 'px-2 py-2 text-left text-[11px] font-bold text-slate-600';
+                    const campusNames = demo.learnersByCampus.map(r => r.campus);
+                    const setLearner = (i: number, patch: Partial<{ campus: string; male: number; female: number }>) =>
+                      setDemo({
+                        ...demo,
+                        learnersByCampus: demo.learnersByCampus.map((r, j) => j === i ? { ...r, ...patch } : r),
+                        // keep the campus name in sync across the learner and personnel tables
+                        personnelByCampus: patch.campus !== undefined
+                          ? demo.personnelByCampus.map((r, j) => j === i ? { ...r, campus: patch.campus as string } : r)
+                          : demo.personnelByCampus,
+                      });
+                    const setStaff = (i: number, patch: any) =>
+                      setDemo({ ...demo, personnelByCampus: demo.personnelByCampus.map((r, j) => j === i ? { ...r, ...patch } : r) });
+                    const setSection = (i: number, patch: any) =>
+                      setDemo({ ...demo, sections: demo.sections.map((r, j) => j === i ? { ...r, ...patch } : r) });
+                    return (
+                      <div className="space-y-5 pt-4 border-t border-slate-100">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700">Demographic Profile</label>
+                          <p className="text-[11px] text-slate-500">Shown on the School Profile page once you enter numbers. Totals are computed automatically.</p>
+                        </div>
+
+                        {/* Learners per campus */}
+                        <div className="space-y-2">
+                          <div className="text-xs font-bold text-blue-900">Learners per campus</div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full min-w-[420px]">
+                              <thead><tr className="bg-slate-50"><th className={th}>Campus</th><th className={th}>Male</th><th className={th}>Female</th></tr></thead>
+                              <tbody>
+                                {demo.learnersByCampus.map((r, i) => (
+                                  <tr key={i} className="border-t border-slate-100">
+                                    <td className="px-2 py-1.5"><input type="text" value={r.campus} onChange={(e) => setLearner(i, { campus: e.target.value })} className={text} /></td>
+                                    <td className="px-2 py-1.5"><input type="number" min={0} value={r.male} onChange={(e) => setLearner(i, { male: num(e.target.value) })} className={cell} /></td>
+                                    <td className="px-2 py-1.5"><input type="number" min={0} value={r.female} onChange={(e) => setLearner(i, { female: num(e.target.value) })} className={cell} /></td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+                        {/* Sections */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs font-bold text-blue-900">Sections (learners per section)</div>
+                            <button
+                              type="button"
+                              onClick={() => setDemo({ ...demo, sections: [...demo.sections, { grade: '', section: '', campus: campusNames[0] || '', male: 0, female: 0 }] })}
+                              className="px-2.5 py-1 text-[11px] font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-md"
+                            >
+                              + Add section
+                            </button>
+                          </div>
+                          {demo.sections.length === 0 && (
+                            <p className="text-[11px] text-slate-500">No sections yet. Click "+ Add section".</p>
+                          )}
+                          {demo.sections.length > 0 && (
+                            <div className="overflow-x-auto">
+                              <table className="w-full min-w-[640px]">
+                                <thead><tr className="bg-slate-50"><th className={th}>Grade</th><th className={th}>Section</th><th className={th}>Campus</th><th className={th}>Male</th><th className={th}>Female</th><th className={th}></th></tr></thead>
+                                <tbody>
+                                  {demo.sections.map((r, i) => (
+                                    <tr key={i} className="border-t border-slate-100">
+                                      <td className="px-2 py-1.5"><input type="text" placeholder="Grade 7" value={r.grade} onChange={(e) => setSection(i, { grade: e.target.value })} className={text} /></td>
+                                      <td className="px-2 py-1.5"><input type="text" placeholder="Section name" value={r.section} onChange={(e) => setSection(i, { section: e.target.value })} className={text} /></td>
+                                      <td className="px-2 py-1.5">
+                                        <select value={r.campus} onChange={(e) => setSection(i, { campus: e.target.value })} className={text + ' bg-white'}>
+                                          {campusNames.map(n => <option key={n} value={n}>{n}</option>)}
+                                          {r.campus && !campusNames.includes(r.campus) && <option value={r.campus}>{r.campus}</option>}
+                                        </select>
+                                      </td>
+                                      <td className="px-2 py-1.5"><input type="number" min={0} value={r.male} onChange={(e) => setSection(i, { male: num(e.target.value) })} className={cell} /></td>
+                                      <td className="px-2 py-1.5"><input type="number" min={0} value={r.female} onChange={(e) => setSection(i, { female: num(e.target.value) })} className={cell} /></td>
+                                      <td className="px-2 py-1.5"><button type="button" onClick={() => setDemo({ ...demo, sections: demo.sections.filter((_, j) => j !== i) })} className="text-[11px] font-semibold text-red-600 hover:underline">Remove</button></td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Faculty & staff per campus */}
+                        <div className="space-y-2">
+                          <div className="text-xs font-bold text-blue-900">Faculty and staff per campus</div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full min-w-[560px]">
+                              <thead><tr className="bg-slate-50"><th className={th}>Campus</th><th className={th}>Faculty Male</th><th className={th}>Faculty Female</th><th className={th}>Staff Male</th><th className={th}>Staff Female</th></tr></thead>
+                              <tbody>
+                                {demo.personnelByCampus.map((r, i) => (
+                                  <tr key={i} className="border-t border-slate-100">
+                                    <td className="px-2 py-1.5 text-xs font-semibold text-slate-700">{r.campus}</td>
+                                    <td className="px-2 py-1.5"><input type="number" min={0} value={r.facultyMale} onChange={(e) => setStaff(i, { facultyMale: num(e.target.value) })} className={cell} /></td>
+                                    <td className="px-2 py-1.5"><input type="number" min={0} value={r.facultyFemale} onChange={(e) => setStaff(i, { facultyFemale: num(e.target.value) })} className={cell} /></td>
+                                    <td className="px-2 py-1.5"><input type="number" min={0} value={r.staffMale} onChange={(e) => setStaff(i, { staffMale: num(e.target.value) })} className={cell} /></td>
+                                    <td className="px-2 py-1.5"><input type="number" min={0} value={r.staffFemale} onChange={(e) => setStaff(i, { staffFemale: num(e.target.value) })} className={cell} /></td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          <p className="text-[11px] text-slate-500">Campus names are edited in the "Learners per campus" table above.</p>
+                        </div>
                       </div>
                     );
                   })()}
@@ -1045,7 +1166,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         data: {
                           id: 'campus-' + Date.now(),
                           name: 'New Campus Branch',
-                          category: 'Main Campus',
+                          category: '',
                           address: 'Alcantara, Romblon',
                           description: 'Description of the campus...',
                           imageUrl: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80',
@@ -1199,7 +1320,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {activeModule === 'campuses' && campuses.map(c => (
                   <div key={c.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900">{c.name} ({c.category})</h4>
+                      <h4 className="text-sm font-bold text-slate-900">{c.name}{c.category ? ` (${c.category})` : ''}</h4>
                       <p className="text-xs text-slate-500">{c.address} · Caretaker: {c.headPersonnel}</p>
                     </div>
                     <div className="flex gap-2">
@@ -1494,10 +1615,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block font-bold text-slate-700 mb-1">Category</label>
-                        <select value={d.category === 'Senior High School' ? 'Senior High School' : 'Main Campus'} onChange={(e) => set({ category: e.target.value })} className={inp + ' bg-white'}>
-                          <option>Main Campus</option>
-                          <option>Senior High School</option>
+                        <label className="block font-bold text-slate-700 mb-1">Category <span className="font-normal text-slate-400">(optional)</span></label>
+                        <select value={d.category === 'Main Campus' || d.category === 'Senior High School' ? d.category : ''} onChange={(e) => set({ category: e.target.value })} className={inp + ' bg-white'}>
+                          <option value="">— None (leave blank) —</option>
+                          <option value="Main Campus">Main Campus</option>
+                          <option value="Senior High School">Senior High School</option>
                         </select>
                       </div>
                       <div>
@@ -2002,7 +2124,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       const { gradeLevelsText, ...rest } = c;
                       store.saveCampus({
                         ...rest,
-                        category: c.category === 'Senior High School' ? 'Senior High School' : 'Main Campus',
+                        category: c.category === 'Main Campus' || c.category === 'Senior High School' ? c.category : '',
                         gradeLevels: gl.map((x: string) => x.trim()).filter(Boolean),
                         programsOffered: (c.programsOffered || []).map((x: string) => x.trim()).filter(Boolean),
                         facilities: (c.facilities || []).map((x: string) => x.trim()).filter(Boolean),

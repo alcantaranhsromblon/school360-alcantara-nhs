@@ -59,11 +59,13 @@ export const CampusesView: React.FC<CampusesViewProps> = ({ initialCampusId, onN
             }`}
           >
             <span>{campus.name}</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-sm ${
-              selectedCampusId === campus.id ? 'bg-blue-800 text-amber-300' : 'bg-slate-100 text-slate-500'
-            }`}>
-              {campus.category}
-            </span>
+            {campus.category && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-sm ${
+                selectedCampusId === campus.id ? 'bg-blue-800 text-amber-300' : 'bg-slate-100 text-slate-500'
+              }`}>
+                {campus.category}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -81,9 +83,11 @@ export const CampusesView: React.FC<CampusesViewProps> = ({ initialCampusId, onN
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent flex items-end p-6 sm:p-8">
                 <div className="text-white">
-                  <div className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                    {activeCampus.category}
-                  </div>
+                  {activeCampus.category && (
+                    <div className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                      {activeCampus.category}
+                    </div>
+                  )}
                   <h2 className="text-2xl sm:text-3xl font-black text-white mt-1">
                     {activeCampus.name}
                   </h2>

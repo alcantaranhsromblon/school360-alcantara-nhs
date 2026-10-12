@@ -1,4 +1,4 @@
-import { HistoryContent, DepedContent, FooterContent, CurricularLevel } from '../types';
+import { HistoryContent, DepedContent, FooterContent, CurricularLevel, DemographicProfile } from '../types';
 
 export const defaultHistory: HistoryContent = {
   banner: 'From humble municipal beginnings in 1968 to an award-winning center of academic and technical excellence in the Division of Romblon.',
@@ -65,3 +65,17 @@ export const defaultCurricularPrograms: CurricularLevel[] = [
     ],
   },
 ];
+
+export const defaultDemographics: DemographicProfile = {
+  learnersByCampus: [
+    { campus: 'Campus A (Main Campus)', male: 0, female: 0 },
+    { campus: 'Campus B', male: 0, female: 0 },
+    { campus: 'Senior High School Campus', male: 0, female: 0 },
+  ],
+  sections: [],
+  personnelByCampus: [
+    { campus: 'Campus A (Main Campus)', facultyMale: 0, facultyFemale: 0, staffMale: 0, staffFemale: 0 },
+    { campus: 'Campus B', facultyMale: 0, facultyFemale: 0, staffMale: 0, staffFemale: 0 },
+    { campus: 'Senior High School Campus', facultyMale: 0, facultyFemale: 0, staffMale: 0, staffFemale: 0 },
+  ],
+};

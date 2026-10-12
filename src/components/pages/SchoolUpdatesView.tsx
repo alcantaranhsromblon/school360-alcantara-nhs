@@ -111,7 +111,7 @@ export const SchoolUpdatesView: React.FC<SchoolUpdatesViewProps> = ({ onNavigate
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search internal updates..."
+            placeholder="Search school updates..."
             className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-600"
           />
         </div>

@@ -178,12 +178,9 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
                 onClick={() => setSelectedNews(item)}
                 className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden hover:shadow-md transition-all cursor-pointer flex flex-col group"
               >
-                <div className="aspect-video overflow-hidden relative">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                  />
+                <div className="aspect-video overflow-hidden relative bg-slate-900">
+                  <img src={item.imageUrl} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50" />
+                  <img src={item.imageUrl} alt={item.title} className="relative w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                   <div className="absolute top-3 left-3 bg-blue-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">
                     {item.category}
                   </div>
@@ -450,17 +447,14 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
 
       {/* FULL STORY MODAL */}
       {selectedNews && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95">
-            <div className="relative aspect-video shrink-0 overflow-hidden">
-              <img
-                src={selectedNews.imageUrl}
-                alt={selectedNews.title}
-                className="w-full h-full object-cover object-top"
-              />
+        <div className="fixed inset-0 z-50 bg-white">
+          <div className="relative w-full h-full overflow-y-auto">
+            <div className="relative bg-slate-900 overflow-hidden">
+              <img src={selectedNews.imageUrl} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40" />
+              <img src={selectedNews.imageUrl} alt={selectedNews.title} className="relative block w-full h-auto max-h-[75vh] object-contain mx-auto" />
               <button
                 onClick={() => setSelectedNews(null)}
-                className="absolute top-3 right-3 bg-slate-900/70 hover:bg-slate-900 text-white p-2 rounded-full"
+                className="fixed top-3 right-3 z-10 bg-slate-900/80 hover:bg-slate-900 text-white w-10 h-10 flex items-center justify-center rounded-full shadow-lg"
               >
                 ✕
               </button>
@@ -469,7 +463,7 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
               </div>
             </div>
 
-            <div className="p-6 overflow-y-auto flex-1 space-y-4">
+            <div className="p-5 sm:p-8 md:p-10 w-full max-w-5xl mx-auto space-y-5">
               <div className="text-xs text-slate-400 flex items-center gap-2">
                 <span>{selectedNews.publishedDate}</span>
                 {selectedNews.writer && (
@@ -479,13 +473,13 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
                 </>
                 )}
               </div>
-              <h3 className="text-xl font-bold text-slate-900 leading-snug">
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-snug">
                 {selectedNews.title}
               </h3>
               <p className="text-xs font-medium text-blue-900 italic bg-blue-50/70 p-3.5 rounded-lg border-l-4 border-blue-800">
                 {selectedNews.summary}
               </p>
-              <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+              <div className="text-base sm:text-lg text-slate-700 leading-relaxed whitespace-pre-line">
                 {selectedNews.content}
               </div>
             </div>
