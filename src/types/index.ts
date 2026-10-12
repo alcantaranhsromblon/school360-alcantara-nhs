@@ -111,8 +111,6 @@ export interface NewsItem {
   author: string;
   /** Name shown publicly as the article's writer */
   writer?: string;
-  /** School organization that submitted the article */
-  organization?: string;
   publishedDate: string;
   imageUrl: string;
   isPublished: boolean;

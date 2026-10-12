@@ -291,7 +291,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
               onClick={() => setSelectedNews(item)}
               className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden hover:shadow-md transition-all cursor-pointer flex flex-col group"
             >
-              <div className="h-44 overflow-hidden relative">
+              <div className="aspect-video overflow-hidden relative">
                 <img
                   src={item.imageUrl}
                   alt={item.title}
@@ -311,13 +311,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
                       <span>·</span>
                       <span>Writer: {item.writer}</span>
                     </>
-                    )}}
-                    {item.organization && (
-                      <>
-                        <span>·</span>
-                        <span className="font-semibold text-blue-900">{item.organization}</span>
-                      </>
-                    )
+                    )}
                   </div>
 
                   <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-900 transition-colors line-clamp-2 leading-snug">
@@ -569,7 +563,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
       {selectedNews && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
           <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95">
-            <div className="relative h-56 shrink-0 overflow-hidden">
+            <div className="relative aspect-video shrink-0 overflow-hidden">
               <img
                 src={selectedNews.imageUrl}
                 alt={selectedNews.title}
@@ -593,12 +587,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
                 <>
                   <span>·</span>
                   <span>Writer: {selectedNews.writer}</span>
-                </>
-                )}
-                {selectedNews.organization && (
-                <>
-                  <span>·</span>
-                  <span className="font-semibold text-blue-900">{selectedNews.organization}</span>
                 </>
                 )}
               </div>

@@ -647,7 +647,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       content: '',
                       author: currentUser?.fullName || 'School Admin',
                       writer: '',
-                      organization: '',
                       publishedDate: new Date().toISOString().split('T')[0],
                       imageUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80',
                       isPublished: true,
@@ -1435,43 +1434,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <option>Extracurricular</option>
                     </select>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-1">Writer</label>
-                      <input
-                        type="text"
-                        value={editingItem.data.writer || ''}
-                        onChange={(e) => setEditingItem({
-                          ...editingItem,
-                          data: { ...editingItem.data, writer: e.target.value }
-                        })}
-                        placeholder="Name of the article's writer"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg"
-                      />
-                      <p className="mt-1 text-[11px] text-slate-500">This name is shown on the article instead of the uploader's.</p>
-                    </div>
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-1">School Organization</label>
-                      <select
-                        value={editingItem.data.organization || ''}
-                        onChange={(e) => setEditingItem({
-                          ...editingItem,
-                          data: { ...editingItem.data, organization: e.target.value }
-                        })}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"
-                      >
-                        <option value="">— Select organization —</option>
-                        <option value="School Administration">School Administration</option>
-                        {organizations.map(o => (
-                          <option key={o.id} value={o.name}>{o.name}</option>
-                        ))}
-                        {editingItem.data.organization
-                          && editingItem.data.organization !== 'School Administration'
-                          && !organizations.some(o => o.name === editingItem.data.organization) && (
-                          <option value={editingItem.data.organization}>{editingItem.data.organization}</option>
-                        )}
-                      </select>
-                    </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Writer</label>
+                    <input
+                      type="text"
+                      value={editingItem.data.writer || ''}
+                      onChange={(e) => setEditingItem({
+                        ...editingItem,
+                        data: { ...editingItem.data, writer: e.target.value }
+                      })}
+                      placeholder="Name of the article's writer"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                    />
+                    <p className="mt-1 text-[11px] text-slate-500">This name is shown on the article instead of the uploader's.</p>
                   </div>
                   <div>
                     <label className="block font-bold text-slate-700 mb-1">Summary / Lead</label>
@@ -1498,7 +1473,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     />
                   </div>
                   <DriveUploadField
-                    label="Cover image"
+                    label="Cover image (best size: 1280 x 720 px, 16:9 landscape)"
                     showPreview
                     value={editingItem.data.imageUrl}
                     onChange={(url) => setEditingItem({ ...editingItem, data: { ...editingItem.data, imageUrl: url } })}
