@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DriveUploadField } from '../common/DriveUploadField';
 import { formatBytes } from '../../lib/driveUpload';
 import { toImageUrl } from '../../lib/drive';
-import { defaultHistory, defaultDeped, defaultFooter } from '../../data/pageDefaults';
+import { defaultHistory, defaultDeped, defaultFooter, defaultCurricularPrograms } from '../../data/pageDefaults';
 import {
   LayoutDashboard,
   Building,
@@ -51,7 +51,8 @@ import {
   MonitoringRecord,
   ApprovedUser,
   Campus,
-  SchoolProfileData
+  SchoolProfileData,
+  CurricularLevel
 } from '../../types';
 
 interface AdminDashboardProps {
@@ -171,7 +172,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Profile Save
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    store.updateSchoolProfile(schoolProfile);
+    const cleaned: SchoolProfileData = schoolProfile.curricularPrograms
+      ? {
+          ...schoolProfile,
+          curricularPrograms: schoolProfile.curricularPrograms
+            .map(l => ({ level: l.level.trim(), programs: l.programs.map(x => x.trim()).filter(Boolean) }))
+            .filter(l => l.level || l.programs.length > 0),
+        }
+      : schoolProfile;
+    store.updateSchoolProfile(cleaned);
+    setSchoolProfile(cleaned);
     refreshAll();
     showNotification('School profile details updated successfully.');
   };
@@ -548,6 +558,53 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       />
                     </div>
                   </div>
+                  {/* Curricular Programs Offered (shown on School Profile) */}
+                  {(() => {
+                    const levels = schoolProfile.curricularPrograms ?? defaultCurricularPrograms;
+                    const setLevels = (next: CurricularLevel[]) => setSchoolProfile({ ...schoolProfile, curricularPrograms: next });
+                    const inp = 'w-full px-3 py-2 text-xs border border-slate-300 rounded-lg';
+                    return (
+                      <div className="space-y-3 pt-4 border-t border-slate-100">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700">Curricular Programs Offered</label>
+                            <p className="text-[11px] text-slate-500">Shown on the School Profile page. One program per line.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setLevels([...levels, { level: '', programs: [''] }])}
+                            className="px-2.5 py-1 text-[11px] font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-md"
+                          >
+                            + Add level
+                          </button>
+                        </div>
+                        {levels.map((lvl, i) => (
+                          <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <input
+                              type="text"
+                              placeholder="e.g. Junior High School (Grades 7 - 10)"
+                              value={lvl.level}
+                              onChange={(e) => setLevels(levels.map((l, j) => j === i ? { ...l, level: e.target.value } : l))}
+                              className={inp + ' font-semibold'}
+                            />
+                            <textarea
+                              rows={5}
+                              value={lvl.programs.join('\n')}
+                              onChange={(e) => setLevels(levels.map((l, j) => j === i ? { ...l, programs: e.target.value.split('\n') } : l))}
+                              className={inp}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setLevels(levels.filter((_, j) => j !== i))}
+                              className="text-[11px] font-semibold text-red-600 hover:underline"
+                            >
+                              Remove level
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                   <DriveUploadField
                     label="Homepage background photo (leave empty to use the default school building photo)"
                     showPreview
@@ -589,6 +646,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       summary: '',
                       content: '',
                       author: currentUser?.fullName || 'School Admin',
+                      writer: '',
+                      organization: '',
                       publishedDate: new Date().toISOString().split('T')[0],
                       imageUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80',
                       isPublished: true,
@@ -987,14 +1046,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         data: {
                           id: 'campus-' + Date.now(),
                           name: 'New Campus Branch',
-                          category: 'Annex / Extension',
+                          category: 'Main Campus',
                           address: 'Alcantara, Romblon',
                           description: 'Description of the campus...',
                           imageUrl: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80',
                           gradeLevels: ['Grade 7', 'Grade 8'],
                           programsOffered: ['General Basic Education'],
                           facilities: ['Classrooms', 'Activity Area'],
-                          headPersonnel: 'Teacher-in-Charge',
+                          headPersonnel: 'Campus Caretaker name',
                           contactNumber: '+63 917 000 0000',
                           isActive: true
                         }
@@ -1142,7 +1201,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <div key={c.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">{c.name} ({c.category})</h4>
-                      <p className="text-xs text-slate-500">{c.address} · Head: {c.headPersonnel}</p>
+                      <p className="text-xs text-slate-500">{c.address} · Caretaker: {c.headPersonnel}</p>
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => setEditingItem({ module: 'campuses', isNew: false, data: { ...c } })} className="p-1.5 hover:bg-slate-200 rounded">
@@ -1376,6 +1435,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <option>Extracurricular</option>
                     </select>
                   </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Writer</label>
+                      <input
+                        type="text"
+                        value={editingItem.data.writer || ''}
+                        onChange={(e) => setEditingItem({
+                          ...editingItem,
+                          data: { ...editingItem.data, writer: e.target.value }
+                        })}
+                        placeholder="Name of the article's writer"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                      />
+                      <p className="mt-1 text-[11px] text-slate-500">This name is shown on the article instead of the uploader's.</p>
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">School Organization</label>
+                      <select
+                        value={editingItem.data.organization || ''}
+                        onChange={(e) => setEditingItem({
+                          ...editingItem,
+                          data: { ...editingItem.data, organization: e.target.value }
+                        })}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"
+                      >
+                        <option value="">— Select organization —</option>
+                        <option value="School Administration">School Administration</option>
+                        {organizations.map(o => (
+                          <option key={o.id} value={o.name}>{o.name}</option>
+                        ))}
+                        {editingItem.data.organization
+                          && editingItem.data.organization !== 'School Administration'
+                          && !organizations.some(o => o.name === editingItem.data.organization) && (
+                          <option value={editingItem.data.organization}>{editingItem.data.organization}</option>
+                        )}
+                      </select>
+                    </div>
+                  </div>
                   <div>
                     <label className="block font-bold text-slate-700 mb-1">Summary / Lead</label>
                     <textarea
@@ -1408,6 +1505,68 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   />
                 </>
               )}
+
+              {editingItem.module === 'campuses' && (() => {
+                const d = editingItem.data;
+                const set = (patch: any) => setEditingItem({ ...editingItem, data: { ...d, ...patch } });
+                const inp = 'w-full px-3 py-2 border border-slate-300 rounded-lg';
+                const lines = (v: string) => v.split('\n');
+                return (
+                  <>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Campus Name</label>
+                      <input type="text" value={d.name || ''} onChange={(e) => set({ name: e.target.value })} className={inp} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">Category</label>
+                        <select value={d.category === 'Senior High School' ? 'Senior High School' : 'Main Campus'} onChange={(e) => set({ category: e.target.value })} className={inp + ' bg-white'}>
+                          <option>Main Campus</option>
+                          <option>Senior High School</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">Contact Number</label>
+                        <input type="text" value={d.contactNumber || ''} onChange={(e) => set({ contactNumber: e.target.value })} className={inp} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Address</label>
+                      <input type="text" value={d.address || ''} onChange={(e) => set({ address: e.target.value })} className={inp} />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Campus Overview</label>
+                      <textarea rows={4} value={d.description || ''} onChange={(e) => set({ description: e.target.value })} className={inp} />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Grade Levels <span className="font-normal text-slate-400">(separate with commas)</span></label>
+                      <input type="text" value={d.gradeLevelsText ?? (d.gradeLevels || []).join(', ')} onChange={(e) => set({ gradeLevelsText: e.target.value })} className={inp} placeholder="Grade 7, Grade 8, Grade 9, Grade 10" />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Programs & Curriculum Offered <span className="font-normal text-slate-400">(one per line)</span></label>
+                      <textarea rows={4} value={(d.programsOffered || []).join('\n')} onChange={(e) => set({ programsOffered: lines(e.target.value) })} className={inp} />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Facilities & Learning Resources <span className="font-normal text-slate-400">(one per line)</span></label>
+                      <textarea rows={4} value={(d.facilities || []).join('\n')} onChange={(e) => set({ facilities: lines(e.target.value) })} className={inp} />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Campus Caretaker</label>
+                      <input type="text" value={d.headPersonnel || ''} onChange={(e) => set({ headPersonnel: e.target.value })} className={inp} placeholder="Name and position" />
+                    </div>
+                    <DriveUploadField
+                      label="Campus photo"
+                      showPreview
+                      value={d.imageUrl || ''}
+                      onChange={(url) => set({ imageUrl: url })}
+                    />
+                    <label className="flex items-center gap-2 text-slate-700 font-semibold">
+                      <input type="checkbox" checked={d.isActive !== false} onChange={(e) => set({ isActive: e.target.checked })} />
+                      Active (visible on the public website)
+                    </label>
+                  </>
+                );
+              })()}
 
               {editingItem.module === 'issuances' && (
                 <>
@@ -1813,7 +1972,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               })()}
 
               {/* General fallback save for other entities */}
-              {!['news', 'issuances', 'users', 'org-chart', 'organizations', 'gallery'].includes(editingItem.module) && (
+              {!['news', 'issuances', 'users', 'org-chart', 'organizations', 'gallery', 'campuses'].includes(editingItem.module) && (
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Title / Name</label>
                   <input
@@ -1831,7 +1990,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               )}
 
-              {!['news', 'issuances', 'users', 'org-chart', 'organizations', 'gallery'].includes(editingItem.module) && editingItem.data.imageUrl !== undefined && (
+              {!['news', 'issuances', 'users', 'org-chart', 'organizations', 'gallery', 'campuses'].includes(editingItem.module) && editingItem.data.imageUrl !== undefined && (
                 <DriveUploadField
                   label="Image"
                   showPreview
@@ -1860,7 +2019,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     } else if (editingItem.module === 'users') {
                       store.saveApprovedUser(editingItem.data);
                     } else if (editingItem.module === 'campuses') {
-                      store.saveCampus(editingItem.data);
+                      const c = editingItem.data;
+                      if (!c.name?.trim()) throw new Error('Campus name is required.');
+                      const gl = c.gradeLevelsText !== undefined
+                        ? String(c.gradeLevelsText).split(',')
+                        : (c.gradeLevels || []);
+                      const { gradeLevelsText, ...rest } = c;
+                      store.saveCampus({
+                        ...rest,
+                        category: c.category === 'Senior High School' ? 'Senior High School' : 'Main Campus',
+                        gradeLevels: gl.map((x: string) => x.trim()).filter(Boolean),
+                        programsOffered: (c.programsOffered || []).map((x: string) => x.trim()).filter(Boolean),
+                        facilities: (c.facilities || []).map((x: string) => x.trim()).filter(Boolean),
+                      });
                     } else if (editingItem.module === 'awards') {
                       store.saveAward(editingItem.data);
                     } else if (editingItem.module === 'programs') {

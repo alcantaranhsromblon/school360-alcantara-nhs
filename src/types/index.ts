@@ -44,6 +44,8 @@ export interface SchoolProfileData {
   totalTeachers: number;
   totalClassrooms: number;
   landArea: string;
+  /** Editable curricular programs shown on School Profile (falls back to built-in list when missing) */
+  curricularPrograms?: CurricularLevel[];
   /** Optional: custom Google Maps embed link (otherwise the map is built from the address) */
   mapUrl?: string;
   /** Optional: homepage hero background photo (defaults to /hero.jpg) */
@@ -52,6 +54,11 @@ export interface SchoolProfileData {
   history?: HistoryContent;
   deped?: DepedContent;
   footer?: FooterContent;
+}
+
+export interface CurricularLevel {
+  level: string;
+  programs: string[];
 }
 
 export interface HistoryContent {
@@ -80,13 +87,14 @@ export interface FooterContent {
 export interface Campus {
   id: string;
   name: string;
-  category: 'Main Campus' | 'Annex / Extension' | 'Senior High School';
+  category: 'Main Campus' | 'Senior High School';
   address: string;
   description: string;
   imageUrl: string;
   gradeLevels: string[];
   programsOffered: string[];
   facilities: string[];
+  /** Shown on the website as "Campus Caretaker" */
   headPersonnel: string;
   contactNumber: string;
   isActive: boolean;
@@ -99,7 +107,12 @@ export interface NewsItem {
   category: 'Academic' | 'DepEd Advisory' | 'Sports' | 'Community' | 'Extracurricular';
   summary: string;
   content: string;
+  /** Account that uploaded the article (internal only, not shown publicly) */
   author: string;
+  /** Name shown publicly as the article's writer */
+  writer?: string;
+  /** School organization that submitted the article */
+  organization?: string;
   publishedDate: string;
   imageUrl: string;
   isPublished: boolean;

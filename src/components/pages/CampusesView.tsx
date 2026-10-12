@@ -146,7 +146,7 @@ export const CampusesView: React.FC<CampusesViewProps> = ({ initialCampusId, onN
               <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl">
                 <div>
                   <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Campus Head / Officer-in-Charge
+                    Campus Caretaker
                   </div>
                   <div className="text-sm font-bold text-slate-900 mt-0.5">
                     {activeCampus.headPersonnel}

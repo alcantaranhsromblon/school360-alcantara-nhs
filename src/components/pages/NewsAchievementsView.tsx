@@ -182,7 +182,7 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
                   <img
                     src={item.imageUrl}
                     alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-3 left-3 bg-blue-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">
                     {item.category}
@@ -193,9 +193,18 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
                   <div>
                     <div className="flex items-center gap-2 text-[11px] text-slate-400 mb-2">
                       <Clock className="w-3 h-3" />
-                      <span>{item.publishedDate}</span>
-                      <span>·</span>
-                      <span>{item.author}</span>
+                      <span>{item.publishedDate}</span>{item.writer && (
+                      <>
+                        <span>·</span>
+                        <span>Writer: {item.writer}</span>
+                      </>
+                      )}
+                    {item.organization && (
+                      <>
+                        <span>·</span>
+                        <span className="font-semibold text-blue-900">{item.organization}</span>
+                      </>
+                    )}
                     </div>
                     <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-900 transition-colors line-clamp-2">
                       {item.title}
@@ -453,7 +462,7 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
               <img
                 src={selectedNews.imageUrl}
                 alt={selectedNews.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
               <button
                 onClick={() => setSelectedNews(null)}
@@ -469,8 +478,18 @@ export const NewsAchievementsView: React.FC<NewsAchievementsViewProps> = ({
             <div className="p-6 overflow-y-auto flex-1 space-y-4">
               <div className="text-xs text-slate-400 flex items-center gap-2">
                 <span>{selectedNews.publishedDate}</span>
-                <span>·</span>
-                <span>By {selectedNews.author}</span>
+                {selectedNews.writer && (
+                <>
+                  <span>·</span>
+                  <span>Writer: {selectedNews.writer}</span>
+                </>
+                )}
+                {selectedNews.organization && (
+                <>
+                  <span>·</span>
+                  <span className="font-semibold text-blue-900">{selectedNews.organization}</span>
+                </>
+                )}
               </div>
               <h3 className="text-xl font-bold text-slate-900 leading-snug">
                 {selectedNews.title}

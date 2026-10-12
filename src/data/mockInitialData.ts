@@ -53,20 +53,6 @@ export const initialCampuses: Campus[] = [
     isActive: true
   },
   {
-    id: 'campus-2',
-    name: 'San Agustin Annex Campus',
-    category: 'Annex / Extension',
-    address: 'Sitio Balogo, Barangay San Agustin, Alcantara, Romblon',
-    description: 'Serving learners from the agricultural upland and coastal barangays with complete Junior High School curriculum and community-centered learning environments.',
-    imageUrl: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80',
-    gradeLevels: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
-    programsOffered: ['Junior High School General Curriculum', 'Agri-Fishery Arts Pre-Vocational Track'],
-    facilities: ['Instructional Classrooms', 'School Garden (Gulayan sa Paaralan)', 'Reading Corner & Learning Resource Room', 'Multi-Purpose Activity Shed'],
-    headPersonnel: 'Mrs. Cynthia M. Gomez, Master Teacher II / Officer-in-Charge',
-    contactNumber: '+63 919 551 2890',
-    isActive: true
-  },
-  {
     id: 'campus-3',
     name: 'Senior High School Complex',
     category: 'Senior High School',
@@ -239,7 +225,7 @@ export const initialEvents: SchoolEvent[] = [
     title: '2nd Quarter Nationwide Simultaneous Earthquake Drill (NSED)',
     date: '2026-10-15',
     time: '09:00 AM - 10:30 AM',
-    venue: 'Alcantara NHS Main & Annex Grounds',
+    venue: 'Alcantara NHS Main Campus Grounds',
     status: 'Upcoming',
     category: 'DepEd Activity',
     description: 'Standard disaster preparedness drill coordinated with the Municipal Disaster Risk Reduction and Management Office (MDRRMO) Alcantara.',

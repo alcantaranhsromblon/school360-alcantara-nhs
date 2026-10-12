@@ -3,6 +3,7 @@ import { Building, Users, BookOpen, Award, MapPin, Mail, Phone, Calendar, Globe,
 import { Breadcrumb } from '../common/Breadcrumb';
 import { mapEmbedUrl, mapOpenUrl, facebookUrl } from '../../lib/maps';
 import { store } from '../../services/store';
+import { defaultCurricularPrograms } from '../../data/pageDefaults';
 
 interface AboutProfileViewProps {
   onNavigate: (view: string, subParam?: string) => void;
@@ -10,6 +11,9 @@ interface AboutProfileViewProps {
 
 export const AboutProfileView: React.FC<AboutProfileViewProps> = ({ onNavigate }) => {
   const profile = store.getSchoolProfile();
+  const curricular = profile.curricularPrograms && profile.curricularPrograms.length > 0
+    ? profile.curricularPrograms
+    : defaultCurricularPrograms;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
@@ -85,7 +89,7 @@ export const AboutProfileView: React.FC<AboutProfileViewProps> = ({ onNavigate }
                 <strong>Alcantara National High School (School ID: 301747)</strong> is a premier public secondary educational institution under the Department of Education, Schools Division of Romblon. Situated in the coastal and agricultural municipality of Alcantara, the school is dedicated to delivering accessible, equitable, and quality basic education.
               </p>
               <p>
-                The school operates across its <strong>Main Campus in Barangay Poblacion</strong>, the <strong>San Agustin Annex Campus</strong>, and the specialized <strong>Senior High School Complex</strong>. Offering the Standard Basic Education Curriculum, the Special Program in Science, Technology & Engineering (STE), and comprehensive Senior High School Academic and TVL Tracks, Alcantara NHS serves as the vanguard of youth development in southern Tablas Island.
+                The school operates across its <strong>Main Campus in Barangay Poblacion</strong> and the specialized <strong>Senior High School Complex</strong>. Offering the Standard Basic Education Curriculum, the Special Program in Science, Technology & Engineering (STE), and comprehensive Senior High School Academic and TVL Tracks, Alcantara NHS serves as the vanguard of youth development in southern Tablas Island.
               </p>
             </div>
           </div>
@@ -97,26 +101,16 @@ export const AboutProfileView: React.FC<AboutProfileViewProps> = ({ onNavigate }
               <span>Curricular Programs Offered</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                <h3 className="text-sm font-bold text-blue-950 mb-2">Junior High School (Grades 7 - 10)</h3>
-                <ul className="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
-                  <li>Regular Basic Education Curriculum (BEC)</li>
-                  <li>Special Science Program (STE)</li>
-                  <li>Special Program in the Arts (SPA)</li>
-                  <li>Pre-Vocational Technical Livelihood Education (TLE)</li>
-                </ul>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                <h3 className="text-sm font-bold text-blue-950 mb-2">Senior High School (Grades 11 - 12)</h3>
-                <ul className="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
-                  <li>STEM (Science, Tech, Engineering & Mathematics)</li>
-                  <li>HUMSS (Humanities and Social Sciences)</li>
-                  <li>ABM (Accountancy, Business & Management)</li>
-                  <li>TVL: Information & Communications Technology (ICT)</li>
-                  <li>TVL: Agri-Fishery Arts (Crop Production & Processing)</li>
-                </ul>
-              </div>
+              {curricular.map((lvl, i) => (
+                <div key={i} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                  <h3 className="text-sm font-bold text-blue-950 mb-2">{lvl.level}</h3>
+                  <ul className="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+                    {lvl.programs.map((prog, j) => (
+                      <li key={j}>{prog}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         </div>

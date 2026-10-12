@@ -1,4 +1,4 @@
-import { HistoryContent, DepedContent, FooterContent } from '../types';
+import { HistoryContent, DepedContent, FooterContent, CurricularLevel } from '../types';
 
 export const defaultHistory: HistoryContent = {
   banner: 'From humble municipal beginnings in 1968 to an award-winning center of academic and technical excellence in the Division of Romblon.',
@@ -43,3 +43,25 @@ export const defaultFooter = (tagline: string): FooterContent => ({
 /** Splits text into paragraphs on blank lines. */
 export const paragraphs = (text: string): string[] =>
   (text || '').split(/\n\s*\n/).map(x => x.trim()).filter(Boolean);
+
+export const defaultCurricularPrograms: CurricularLevel[] = [
+  {
+    level: 'Junior High School (Grades 7 - 10)',
+    programs: [
+      'Regular Basic Education Curriculum (BEC)',
+      'Special Science Program (STE)',
+      'Special Program in the Arts (SPA)',
+      'Pre-Vocational Technical Livelihood Education (TLE)',
+    ],
+  },
+  {
+    level: 'Senior High School (Grades 11 - 12)',
+    programs: [
+      'STEM (Science, Tech, Engineering & Mathematics)',
+      'HUMSS (Humanities and Social Sciences)',
+      'ABM (Accountancy, Business & Management)',
+      'TVL: Information & Communications Technology (ICT)',
+      'TVL: Agri-Fishery Arts (Crop Production & Processing)',
+    ],
+  },
+];
