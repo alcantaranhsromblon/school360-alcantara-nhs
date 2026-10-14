@@ -413,7 +413,7 @@ class SchoolStore {
 
   public getOrganizationByCode(code: string): SchoolOrganization | undefined {
     const c = code.toLowerCase();
-    return this.organizations.find(o => o.code.toLowerCase() === c || o.acronym.toLowerCase() === c);
+    return this.organizations.find(o => (o.code || '').toLowerCase() === c || (o.acronym || '').toLowerCase() === c);
   }
 
   public saveOrganization(raw: SchoolOrganization): void {

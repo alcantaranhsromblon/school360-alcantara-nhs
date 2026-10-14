@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Users,
   Award,
@@ -23,15 +23,26 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
   initialOrgCode = 'SSLG',
   onNavigate
 }) => {
-  const orgs = store.getOrganizations();
+  const orgs = store.getOrganizations().filter(o => o.isPublished !== false || store.getCurrentRole() === 'admin');
   const [selectedOrgCode, setSelectedOrgCode] = useState<string>(() => {
-    if (initialOrgCode && orgs.some(o => o.code.toLowerCase() === initialOrgCode.toLowerCase())) {
-      return initialOrgCode.toUpperCase();
+    if (initialOrgCode && orgs.some(o => (o.code || '').toLowerCase() === initialOrgCode.toLowerCase() || (o.acronym || '').toLowerCase() === initialOrgCode.toLowerCase())) {
+      return initialOrgCode;
     }
     return orgs[0]?.code || 'SSLG';
   });
 
-  const activeOrg = orgs.find(o => o.code.toLowerCase() === selectedOrgCode.toLowerCase()) || orgs[0];
+  // Re-sync when a different organization is chosen from the menu/footer/search
+  useEffect(() => {
+    if (initialOrgCode) setSelectedOrgCode(initialOrgCode);
+  }, [initialOrgCode]);
+
+  const matches = (o: SchoolOrganization, c: string) =>
+    (o.code || '').toLowerCase() === c.toLowerCase() || (o.acronym || '').toLowerCase() === c.toLowerCase();
+  const activeOrg = orgs.find(o => matches(o, selectedOrgCode)) || orgs[0];
+  const objectives = activeOrg?.objectives || [];
+  const activities = activeOrg?.recentActivities || [];
+  const announcements = activeOrg?.announcements || [];
+  const officers = activeOrg?.officers || [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
@@ -64,15 +75,15 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
         {orgs.map(org => (
           <button
             key={org.id}
-            onClick={() => setSelectedOrgCode(org.code)}
+            onClick={() => setSelectedOrgCode(org.code || org.acronym || org.name)}
             className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
               activeOrg?.id === org.id
                 ? 'bg-blue-900 text-white shadow-xs'
                 : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <span>{org.acronym}</span>
-            <span className="text-[10px] text-slate-400 hidden sm:inline">· {org.name}</span>
+            <span>{org.acronym || org.name}</span>
+            {org.acronym && <span className="text-[10px] text-slate-400 hidden sm:inline">· {org.name}</span>}
           </button>
         ))}
       </div>
@@ -93,9 +104,11 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
 
               <div className="space-y-2 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-md bg-blue-900 text-white text-xs font-bold font-mono">
-                    {activeOrg.acronym}
-                  </span>
+                  {activeOrg.acronym && (
+                    <span className="px-2.5 py-0.5 rounded-md bg-blue-900 text-white text-xs font-bold font-mono">
+                      {activeOrg.acronym}
+                    </span>
+                  )}
                   <span className="text-xs text-slate-400 font-medium">Official Recognized Student Organization</span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900">
@@ -128,7 +141,7 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
                   <span>Constitutional Objectives & Mandate</span>
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  {activeOrg.objectives.map((obj, i) => (
+                  {objectives.map((obj, i) => (
                     <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-start gap-2.5">
                       <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                       <span className="text-xs text-slate-700 leading-relaxed">{obj}</span>
@@ -144,7 +157,7 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
                   <span>Recent Activities & Accomplishments</span>
                 </h3>
                 <div className="space-y-3">
-                  {activeOrg.recentActivities.map((act, i) => (
+                  {activities.map((act, i) => (
                     <div key={i} className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
                       <div className="flex items-center justify-between text-xs font-semibold">
                         <span className="text-blue-900">{act.title}</span>
@@ -159,14 +172,14 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
               </div>
 
               {/* Organization Announcements */}
-              {activeOrg.announcements.length > 0 && (
+              {announcements.length > 0 && (
                 <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
                   <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                     <Bell className="w-5 h-5 text-amber-500" />
                     <span>Bulletins & Member Notices</span>
                   </h3>
                   <div className="space-y-3">
-                    {activeOrg.announcements.map((ann, i) => (
+                    {announcements.map((ann, i) => (
                       <div key={i} className="p-4 bg-amber-50/60 border border-amber-200 rounded-xl space-y-1">
                         <div className="flex items-center justify-between text-xs font-bold text-amber-950">
                           <span>{ann.title}</span>
@@ -190,7 +203,7 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
                   <span>Executive Officers Roster</span>
                 </h3>
                 <div className="space-y-3 divide-y divide-slate-100 text-xs">
-                  {activeOrg.officers.map((off, idx) => (
+                  {officers.map((off, idx) => (
                     <div key={idx} className="pt-2.5 first:pt-0">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                         {off.position}

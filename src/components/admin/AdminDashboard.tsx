@@ -1136,7 +1136,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
                 <div><label className={lbl}>About text (under the school name)</label><textarea rows={3} value={f.about} onChange={(e) => set({ about: e.target.value })} className={inp} /></div>
                 <div><label className={lbl}>Region / division line</label><input type="text" value={f.regionLine} onChange={(e) => set({ regionLine: e.target.value })} className={inp} /></div>
-                <div><label className={lbl}>Faculty & Admin Portal note</label><textarea rows={3} value={f.portalNote} onChange={(e) => set({ portalNote: e.target.value })} className={inp} /></div>
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                   <button type="button" className="text-xs font-semibold text-slate-500 hover:text-slate-800" onClick={() => setSchoolProfile({ ...schoolProfile, footer: defaultFooter(schoolProfile.tagline) })}>Restore original text</button>
                   <button type="button" onClick={() => savePages('Footer saved.')} className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold rounded-lg">Save Footer</button>
@@ -1263,7 +1262,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         isNew: true,
                         data: {
                           id: 'orgz-' + Date.now(),
-                          code: 'NEW_ORG',
+                          code: '',
                           name: '',
                           acronym: '',
                           description: '',
@@ -2166,7 +2165,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       if (!o.name?.trim()) throw new Error('Organization name is required.');
                       store.saveOrganization({
                         ...o,
-                        code: (o.code || o.acronym || o.name).trim(),
+                        code: (o.code || o.acronym || o.name).trim().replace(/\s+/g, '_'),
                         objectives: (o.objectives || []).map((x: string) => x.trim()).filter(Boolean),
                       });
                     } else if (editingItem.module === 'updates') {

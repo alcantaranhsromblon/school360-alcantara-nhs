@@ -113,9 +113,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
                 <Shield className="w-4 h-4" />
                 <span>Faculty & Admin Portal</span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                {footer.portalNote}
-              </p>
               <button
                 onClick={onOpenLogin}
                 className="w-full mt-1 py-1.5 px-3 bg-blue-800 hover:bg-blue-700 text-white rounded text-xs font-semibold text-center transition-colors"

@@ -485,7 +485,7 @@ export const Header: React.FC<HeaderProps> = ({
                       onClick={() => handleNavClick('organization', o.code)}
                       className="w-full text-left px-4 py-2.5 text-xs hover:bg-blue-50 font-medium text-slate-700 hover:text-blue-900 block"
                     >
-                      <div className="font-semibold text-slate-900">{o.name} ({o.acronym})</div>
+                      <div className="font-semibold text-slate-900">{o.name}{o.acronym ? ` (${o.acronym})` : ''}</div>
                       <div className="text-[10px] text-slate-500 truncate">{o.adviser}</div>
                     </button>
                   ))}
@@ -692,7 +692,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => handleNavClick('organization', o.code)}
                     className="w-full text-left py-1.5 px-2 hover:text-amber-300"
                   >
-                    {o.name} ({o.acronym})
+                    {o.name}{o.acronym ? ` (${o.acronym})` : ''}
                   </button>
                 ))}
               </div>

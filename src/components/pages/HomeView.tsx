@@ -468,9 +468,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-sm">
-                      {org.acronym}
-                    </span>
+                    {org.acronym ? (
+                      <span className="text-xs font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-sm">
+                        {org.acronym}
+                      </span>
+                    ) : <span />}
                     <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-700 group-hover:translate-x-1 transition-all" />
                   </div>
                   <h4 className="text-sm font-bold text-slate-900 mt-2 line-clamp-1 group-hover:text-blue-900">

@@ -100,10 +100,10 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     // 5. School Organizations
     const orgs = store.getOrganizations();
     for (const o of orgs) {
-      if (o.name.toLowerCase().includes(q) || o.acronym.toLowerCase().includes(q) || o.description.toLowerCase().includes(q)) {
+      if (o.name.toLowerCase().includes(q) || (o.acronym || '').toLowerCase().includes(q) || o.description.toLowerCase().includes(q)) {
         matches.push({
           id: o.id,
-          title: `${o.name} (${o.acronym})`,
+          title: o.acronym ? `${o.name} (${o.acronym})` : o.name,
           snippet: o.description,
           category: 'Student Organization',
           module: 'School Organizations',
