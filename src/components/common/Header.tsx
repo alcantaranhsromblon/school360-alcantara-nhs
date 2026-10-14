@@ -482,7 +482,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {orgs.map(o => (
                     <button
                       key={o.id}
-                      onClick={() => handleNavClick('organization', o.code)}
+                      onClick={() => handleNavClick('organization', o.id)}
                       className="w-full text-left px-4 py-2.5 text-xs hover:bg-blue-50 font-medium text-slate-700 hover:text-blue-900 block"
                     >
                       <div className="font-semibold text-slate-900">{o.name}{o.acronym ? ` (${o.acronym})` : ''}</div>
@@ -689,7 +689,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {orgs.map(o => (
                   <button
                     key={o.id}
-                    onClick={() => handleNavClick('organization', o.code)}
+                    onClick={() => handleNavClick('organization', o.id)}
                     className="w-full text-left py-1.5 px-2 hover:text-amber-300"
                   >
                     {o.name}{o.acronym ? ` (${o.acronym})` : ''}

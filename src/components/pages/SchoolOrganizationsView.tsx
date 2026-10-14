@@ -24,21 +24,24 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
   onNavigate
 }) => {
   const orgs = store.getOrganizations().filter(o => o.isPublished !== false || store.getCurrentRole() === 'admin');
-  const [selectedOrgCode, setSelectedOrgCode] = useState<string>(() => {
-    if (initialOrgCode && orgs.some(o => (o.code || '').toLowerCase() === initialOrgCode.toLowerCase() || (o.acronym || '').toLowerCase() === initialOrgCode.toLowerCase())) {
-      return initialOrgCode;
-    }
-    return orgs[0]?.code || 'SSLG';
-  });
+  const resolve = (key?: string) => {
+    if (!key) return undefined;
+    const k = key.toLowerCase();
+    return (
+      orgs.find(o => o.id === key) ||
+      orgs.find(o => (o.code || '').toLowerCase() === k) ||
+      orgs.find(o => (o.acronym || '').toLowerCase() === k)
+    );
+  };
+  const [selectedId, setSelectedId] = useState<string>(() => resolve(initialOrgCode)?.id || orgs[0]?.id || '');
 
   // Re-sync when a different organization is chosen from the menu/footer/search
   useEffect(() => {
-    if (initialOrgCode) setSelectedOrgCode(initialOrgCode);
+    const found = resolve(initialOrgCode);
+    if (found) setSelectedId(found.id);
   }, [initialOrgCode]);
 
-  const matches = (o: SchoolOrganization, c: string) =>
-    (o.code || '').toLowerCase() === c.toLowerCase() || (o.acronym || '').toLowerCase() === c.toLowerCase();
-  const activeOrg = orgs.find(o => matches(o, selectedOrgCode)) || orgs[0];
+  const activeOrg = orgs.find(o => o.id === selectedId) || orgs[0];
   const objectives = activeOrg?.objectives || [];
   const activities = activeOrg?.recentActivities || [];
   const announcements = activeOrg?.announcements || [];
@@ -75,7 +78,7 @@ export const SchoolOrganizationsView: React.FC<SchoolOrganizationsViewProps> = (
         {orgs.map(org => (
           <button
             key={org.id}
-            onClick={() => setSelectedOrgCode(org.code || org.acronym || org.name)}
+            onClick={() => setSelectedId(org.id)}
             className={`px-4 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
               activeOrg?.id === org.id
                 ? 'bg-blue-900 text-white shadow-xs'

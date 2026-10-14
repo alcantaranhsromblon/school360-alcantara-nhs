@@ -90,7 +90,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
             <ul className="space-y-2 text-xs text-slate-400">
               {orgs.map(o => (
                 <li key={o.id}>
-                  <button onClick={() => onNavigate('organization', o.code)} className="hover:text-amber-400 transition-colors text-left">
+                  <button onClick={() => onNavigate('organization', o.id)} className="hover:text-amber-400 transition-colors text-left">
                     {o.name}{o.acronym ? ` (${o.acronym})` : ''}
                   </button>
                 </li>

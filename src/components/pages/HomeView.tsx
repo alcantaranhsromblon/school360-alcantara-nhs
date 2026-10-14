@@ -463,7 +463,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
             {orgsList.map(org => (
               <div
                 key={org.id}
-                onClick={() => onNavigate('organization', org.code)}
+                onClick={() => onNavigate('organization', org.id)}
                 className="bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-700 transition-all cursor-pointer group flex flex-col justify-between"
               >
                 <div>

@@ -108,7 +108,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
           category: 'Student Organization',
           module: 'School Organizations',
           viewTarget: 'organization',
-          subParam: o.code
+          subParam: o.id
         });
       }
     }
