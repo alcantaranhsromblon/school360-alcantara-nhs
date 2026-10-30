@@ -4,5 +4,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: { port: 3000, host: '0.0.0.0' },
+  base: '/school360-alcantara-nhs/',
+  server: {
+    port: 3000,
+    host: '0.0.0.0',
+  },
 });
