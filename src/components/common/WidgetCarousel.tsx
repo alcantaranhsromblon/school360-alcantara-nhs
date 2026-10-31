@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,8 +13,11 @@ import {
   Activity,
   Smartphone,
   ArrowRight,
+  Newspaper,
+  Facebook,
 } from 'lucide-react';
 import { store } from '../../services/store';
+import { facebookUrl } from '../../lib/maps';
 import { WeatherWidget } from './WeatherWidget';
 
 interface WidgetCarouselProps {
@@ -24,7 +27,166 @@ interface WidgetCarouselProps {
 
 const PANEL = 'rounded-2xl overflow-hidden border border-blue-900/20 shadow-xs bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white';
 
-/* ---------- Slide 2: Upcoming events ---------- */
+/* ---------- Slide 2: Latest news and announcements ---------- */
+
+const NewsWidget: React.FC<{ onNavigate: WidgetCarouselProps['onNavigate'] }> = ({ onNavigate }) => {
+  const items = store.getNews().slice(0, 4);
+  const [lead, ...rest] = items;
+
+  return (
+    <div className={PANEL}>
+      <div className="flex flex-wrap items-center justify-between gap-3 px-6 sm:px-7 py-4 border-b border-white/10 bg-black/20">
+        <div>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-300">
+            <Newspaper className="w-3.5 h-3.5" />
+            <span>News and announcements</span>
+          </div>
+          <div className="text-sm text-blue-100 mt-0.5">Latest from Alcantara National High School</div>
+        </div>
+        <button
+          onClick={() => onNavigate('news')}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors"
+        >
+          <span>View all news</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {!lead ? (
+        <div className="p-6 sm:p-7 text-sm text-blue-200 py-10 text-center">No news has been posted yet. Please check back soon.</div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12">
+          {/* Lead story */}
+          <button
+            onClick={() => onNavigate('news', lead.id)}
+            className="lg:col-span-6 text-left p-6 sm:p-7 hover:bg-white/5 transition-colors"
+          >
+            <div className="aspect-video rounded-xl overflow-hidden relative bg-blue-950 border border-white/10">
+              {lead.imageUrl && (
+                <>
+                  <img src={lead.imageUrl} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50" />
+                  <img src={lead.imageUrl} alt={lead.title} className="relative w-full h-full object-contain" />
+                </>
+              )}
+              <div className="absolute top-3 left-3 bg-amber-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-sm">
+                {lead.category}
+              </div>
+            </div>
+            <div className="mt-3 flex items-center gap-2 text-[11px] text-blue-200">
+              <Clock className="w-3 h-3" />
+              <span>{lead.publishedDate}</span>
+            </div>
+            <div className="text-base font-bold text-white mt-1 leading-snug">{lead.title}</div>
+            {lead.summary && <p className="text-xs text-blue-200 mt-1.5 leading-relaxed line-clamp-2">{lead.summary}</p>}
+          </button>
+
+          {/* More stories */}
+          <div className="lg:col-span-6 p-6 sm:p-7 bg-black/20 border-t lg:border-t-0 lg:border-l border-white/10">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-blue-200 mb-3">More stories</div>
+            {rest.length === 0 ? (
+              <div className="text-sm text-blue-200">No other stories yet.</div>
+            ) : (
+              <div className="space-y-2">
+                {rest.map((n) => (
+                  <button
+                    key={n.id}
+                    onClick={() => onNavigate('news', n.id)}
+                    className="w-full text-left rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-3 transition-colors"
+                  >
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-200">
+                      <span className={n.category === 'DepEd Advisory' ? 'text-amber-300' : ''}>{n.category}</span> · {n.publishedDate}
+                    </div>
+                    <div className="text-sm font-bold text-white mt-0.5 leading-snug">{n.title}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ---------- Facebook page feed ---------- */
+
+const FacebookWidget: React.FC<{ pageUrl: string }> = ({ pageUrl }) => {
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  const [boxWidth, setBoxWidth] = useState(340);
+
+  // The Facebook plugin accepts a width between 180 and 500 px
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const measure = () => setBoxWidth(Math.max(280, Math.min(500, Math.floor(el.clientWidth))));
+    measure();
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(measure);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  const height = 560;
+  const src =
+    'https://www.facebook.com/plugins/page.php' +
+    `?href=${encodeURIComponent(pageUrl)}` +
+    '&tabs=timeline' +
+    `&width=${boxWidth}&height=${height}` +
+    '&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false';
+
+  return (
+    <div className={PANEL}>
+      <div className="px-6 sm:px-7 py-4 border-b border-white/10 bg-black/20">
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-300">
+          <Facebook className="w-3.5 h-3.5" />
+          <span>Facebook page</span>
+        </div>
+        <div className="text-sm text-blue-100 mt-0.5">Follow our official page for the latest posts</div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12">
+        <div className="lg:col-span-5 p-6 sm:p-7 flex flex-col justify-center">
+          <div className="text-lg font-bold text-white leading-snug">Stay connected with Alcantara National High School</div>
+          <p className="text-sm text-blue-200 mt-2 leading-relaxed">
+            Announcements, class advisories, photos, and school activities are posted on our official Facebook page.
+          </p>
+          <a
+            href={pageUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex items-center gap-1.5 self-start px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors"
+          >
+            <span>Visit our Facebook page</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+          <p className="text-[11px] text-blue-300 mt-4 leading-relaxed">
+            If the feed does not appear, your browser, ad blocker, or privacy settings may be blocking Facebook. Use the button above instead.
+          </p>
+        </div>
+
+        <div ref={boxRef} className="lg:col-span-7 p-4 sm:p-6 bg-black/20 border-t lg:border-t-0 lg:border-l border-white/10 flex justify-center">
+          <iframe
+            key={boxWidth}
+            title="Alcantara National High School on Facebook"
+            src={src}
+            width={boxWidth}
+            height={height}
+            style={{ border: 'none', overflow: 'hidden', maxWidth: '100%', background: '#ffffff', borderRadius: 12 }}
+            scrolling="no"
+            frameBorder={0}
+            loading="lazy"
+            allow="encrypted-media"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ---------- Slide 3: Upcoming events ---------- */
 
 const EventsWidget: React.FC<{ onNavigate: WidgetCarouselProps['onNavigate'] }> = ({ onNavigate }) => {
   const all = store.getEvents();
@@ -102,7 +264,7 @@ const EventsWidget: React.FC<{ onNavigate: WidgetCarouselProps['onNavigate'] }> 
   );
 };
 
-/* ---------- Slide 3: Quick links ---------- */
+/* ---------- Slide 4: Quick links ---------- */
 
 const LinksWidget: React.FC<{ onOpenLogin: () => void }> = ({ onOpenLogin }) => {
   const links = [
@@ -164,8 +326,12 @@ const LinksWidget: React.FC<{ onOpenLogin: () => void }> = ({ onOpenLogin }) => 
 /* ---------- Carousel ---------- */
 
 export const WidgetCarousel: React.FC<WidgetCarouselProps> = ({ onNavigate, onOpenLogin }) => {
+  const fbPage = facebookUrl(store.getSchoolProfile().facebookPage);
+
   const slides = [
     { id: 'weather', label: 'Weather and hazard watch', node: <WeatherWidget /> },
+    { id: 'news', label: 'News and announcements', node: <NewsWidget onNavigate={onNavigate} /> },
+    ...(fbPage ? [{ id: 'facebook', label: 'Facebook page', node: <FacebookWidget pageUrl={fbPage} /> }] : []),
     { id: 'events', label: 'Upcoming events', node: <EventsWidget onNavigate={onNavigate} /> },
     { id: 'links', label: 'Quick links', node: <LinksWidget onOpenLogin={onOpenLogin} /> },
   ];
