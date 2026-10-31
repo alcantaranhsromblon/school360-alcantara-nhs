@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {/* School Logo */}
             <img
-              src="/logo.png"
+              src={`${import.meta.env.BASE_URL}logo.png`}
               alt="Alcantara National High School seal"
               className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform"
             />
