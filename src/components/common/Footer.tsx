@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
           {/* Col 1: School Identity */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Alcantara National High School seal" className="w-12 h-12 object-contain shrink-0" />
+                 <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Alcantara National High School seal" className="w-12 h-12 object-contain shrink-0" />
               <div>
                 <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">{profile.division}</div>
                 <div className="text-sm font-extrabold text-white leading-tight">{profile.schoolName}</div>
