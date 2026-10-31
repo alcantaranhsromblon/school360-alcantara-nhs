@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 
 // Alcantara, Romblon (approximate coordinates)
-const LAT = 12.4;
-const LON = 122.03;
+const LAT = 12.26;
+const LON = 122.05;
 const REFRESH_MS = 15 * 60 * 1000;
 
 const LIGTAS_URL = 'https://ligtas.cair.ph/maps/';
