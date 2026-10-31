@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { store } from '../../services/store';
 import { toImageUrl } from '../../lib/drive';
-   import { WeatherWidget } from '../common/WeatherWidget';
+import { WidgetCarousel } from '../common/WidgetCarousel';
 import { NewsItem, SchoolEvent, AwardItem, Campus, SchoolOrganization } from '../../types';
 
 interface HomeViewProps {
@@ -135,10 +135,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
           </div>
         </div>
       </section>
-         {/* WEATHER WIDGET */}
-         <section className="max-w-7xl mx-auto px-4 sm:px-8">
-           <WeatherWidget />
-         </section>
+
+      {/* WEATHER WIDGET */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8">
+        <WidgetCarousel onNavigate={onNavigate} onOpenLogin={onOpenLogin} />
+      </section>
+
       {/* WELCOME MESSAGE FROM PRINCIPAL */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
