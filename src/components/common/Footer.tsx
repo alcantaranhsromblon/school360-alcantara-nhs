@@ -122,7 +122,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenLogin }) => {
             </div>
 
             <div className="pt-2 text-[11px] text-slate-500 space-y-1">
-              <div>{footer.regionLine}</div>
+              <div>
+                <a
+                  href="https://depedsdoromblon.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-slate-300 hover:underline transition-colors"
+                >
+                  {footer.regionLine}
+                </a>
+              </div>
               {profile.facebookPage && (
                 <div className="flex items-center gap-1 hover:text-slate-400">
                   <a href={facebookUrl(profile.facebookPage)} target="_blank" rel="noreferrer" className="flex items-center gap-1">
