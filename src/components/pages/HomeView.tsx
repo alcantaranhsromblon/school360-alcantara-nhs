@@ -44,7 +44,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenLogin }) =
         {/* Background photo */}
         <div className="absolute inset-0 z-0">
           <img
-            src={profile.heroImageUrl ? toImageUrl(profile.heroImageUrl, 2000) : '/hero.jpg'}
+            src={profile.heroImageUrl ? toImageUrl(profile.heroImageUrl, 2000) : `${import.meta.env.BASE_URL}hero.jpg`}
             alt="Alcantara National High School building"
             className="w-full h-full object-cover object-center"
           />
